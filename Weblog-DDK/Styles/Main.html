@@ -125,7 +125,23 @@ a:hover{text-decoration:underline}
   border-left-color:var(--sidebar-border);
   font-weight:600;
 }
-.sidebar-nav a .icon{width:16px; text-align:center; font-size:13px}
+.sidebar-nav a .icon{width:16px; text-align:center; font-size:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0}
+.sidebar-nav a .icon svg{width:15px;height:15px;display:block}
+.sidebar-nav a .icon .num{
+  width:16px;height:16px;border-radius:50%;border:1px solid currentColor;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;line-height:1;
+}
+.ic{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ic svg{display:block}
+/* Ikon inline slim di konten — selalu sejajar teks */
+.badge-pill svg,.done-tag svg,.lock-tag svg,.locked-note svg,.pill svg,
+.blk-note strong svg,.blk-case strong svg,.glossary-title svg,
+.materi-content h3 svg,.quiz-top-title svg,.quiz-review-why svg,.why-box svg,
+.btn-hero-primary svg,.btn svg{display:inline-block;vertical-align:-2px;margin-right:5px}
+.done-tag,.lock-tag{display:inline-flex;align-items:center;gap:5px}
+.done-tag{color:#0a7a2e;font-size:11px;font-weight:800}
+.lock-tag{color:#a8b3a8;font-size:11px;font-weight:800}
 .sidebar-footer{
   margin-top:auto; padding:12px; border-top:1px solid #1a3d2a;
 }
@@ -288,9 +304,11 @@ tbody tr:hover{background:#fafdfa}
   position:fixed;top:16px;right:16px;z-index:9999;
   background:var(--dark);color:#fff;padding:12px 16px;border-radius:10px;
   box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:13px;
-  transform:translateX(120%);transition:transform 0.25s;
+  opacity:0;visibility:hidden;transform:translateY(-8px);
+  transition:opacity 0.25s,transform 0.25s,visibility 0.25s;
+  pointer-events:none;
 }
-.toast.show{transform:translateX(0)}
+.toast.show{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
 .toast.success{background:var(--primary)}
 .toast.error{background:var(--accent)}
 .likert{display:flex;gap:8px;flex-wrap:wrap}

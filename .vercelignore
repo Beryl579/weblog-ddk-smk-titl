@@ -1,0 +1,45 @@
+# Vercel ignore — selain .gitignore, cegah file runtime/privat ikut di-upload ke Vercel.
+# Kode sumber Weblog-DDK/*.gs tetap ikut (dokumentasi), yang dikecualikan hanya data & artefak lokal.
+
+local/db.json
+local/db.json.bak
+local/uploads/
+local/server.log
+*.log
+
+# Dokumen privat / besar
+SKRIPSI*.pdf
+
+# Dependensi & cache
+node_modules/
+.pnp/
+.pnp.js
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Rahasia deployment GAS
+.env
+.env.*
+!.env.example
+.clasp.json
+.clasprc.json
+
+# Editor & OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Alat internal
+.freebuff/
+
+# Sampah sementara
+*.tmp
+*.orig
+~$*

@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png">
+<link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <title>Weblog DDK — Siswa</title>
 <style>/* Main.html — Weblog DDK — design system (sidebar gelap + konten terang).
    Catatan: berkas ini berekstensi .html, BUKAN .css, karena Google Apps Script
@@ -131,7 +135,23 @@ a:hover{text-decoration:underline}
   border-left-color:var(--sidebar-border);
   font-weight:600;
 }
-.sidebar-nav a .icon{width:16px; text-align:center; font-size:13px}
+.sidebar-nav a .icon{width:16px; text-align:center; font-size:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0}
+.sidebar-nav a .icon svg{width:15px;height:15px;display:block}
+.sidebar-nav a .icon .num{
+  width:16px;height:16px;border-radius:50%;border:1px solid currentColor;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;line-height:1;
+}
+.ic{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ic svg{display:block}
+/* Ikon inline slim di konten — selalu sejajar teks */
+.badge-pill svg,.done-tag svg,.lock-tag svg,.locked-note svg,.pill svg,
+.blk-note strong svg,.blk-case strong svg,.glossary-title svg,
+.materi-content h3 svg,.quiz-top-title svg,.quiz-review-why svg,.why-box svg,
+.btn-hero-primary svg,.btn svg{display:inline-block;vertical-align:-2px;margin-right:5px}
+.done-tag,.lock-tag{display:inline-flex;align-items:center;gap:5px}
+.done-tag{color:#0a7a2e;font-size:11px;font-weight:800}
+.lock-tag{color:#a8b3a8;font-size:11px;font-weight:800}
 .sidebar-footer{
   margin-top:auto; padding:12px; border-top:1px solid #1a3d2a;
 }
@@ -294,9 +314,11 @@ tbody tr:hover{background:#fafdfa}
   position:fixed;top:16px;right:16px;z-index:9999;
   background:var(--dark);color:#fff;padding:12px 16px;border-radius:10px;
   box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:13px;
-  transform:translateX(120%);transition:transform 0.25s;
+  opacity:0;visibility:hidden;transform:translateY(-8px);
+  transition:opacity 0.25s,transform 0.25s,visibility 0.25s;
+  pointer-events:none;
 }
-.toast.show{transform:translateX(0)}
+.toast.show{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
 .toast.success{background:var(--primary)}
 .toast.error{background:var(--accent)}
 .likert{display:flex;gap:8px;flex-wrap:wrap}
@@ -399,24 +421,33 @@ tbody tr:hover{background:#fafdfa}
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <div class="logo-icon">⚡</div>
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
       <div><div class="sidebar-title">Weblog DDK</div><div class="sidebar-subtitle">Dasar-Dasar Ketenagalistrikan</div></div>
     </div>
     <div class="sidebar-section">Mulai</div>
-    <nav class="sidebar-nav"><a href="#/dashboard" data-r="dashboard"><span class="icon">🏠</span> Dashboard</a></nav>
+    <nav class="sidebar-nav"><a href="#/dashboard" data-r="dashboard"><span class="icon ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Dashboard</a></nav>
     <div class="sidebar-section">Modul Materi</div>
     <nav class="sidebar-nav" id="navMateri"></nav>
     <div class="sidebar-section">Evaluasi</div>
     <nav class="sidebar-nav" id="navUjian"></nav>
     <div class="sidebar-section">Akun</div>
-    <nav class="sidebar-nav"><a href="#" onclick="doLogout();return false"><span class="icon">↪</span> Logout</a></nav>
+    <nav class="sidebar-nav"><a href="#" onclick="doLogout();return false"><span class="icon ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Logout</a></nav>
     <div class="sidebar-footer"><small id="sbUser">...</small><br><small style="opacity:0.7">SMK TR 2 Sinar Husni</small></div>
   </aside>
 
-  <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+  <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Menu">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
   <div class="mobile-topbar">
-    <div style="display:flex;align-items:center;gap:8px"><div class="logo-icon">⚡</div><strong>Weblog DDK</strong></div>
-    <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;color:#fff;font-size:20px">☰</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <strong>Weblog DDK</strong>
+    </div>
+    <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;color:#fff;display:flex;align-items:center" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
   </div>
 
   <main class="main" id="main"></main>
@@ -448,6 +479,25 @@ function showLoading(on){
 var PASS_SCORE = 75;
 var user = null;
 var progress = null; // {kuis:{kuis1:{best,passed,attempts},...}, ujian:{...}}
+
+/* ---------- IKON SVG SLIM (stroke, 2px) — pengganti emoji ---------- */
+var _SVG_OPEN = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+function _ic(inner, s){ return '<svg width="'+(s||13)+'" height="'+(s||13)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>'; }
+var ICON = {
+  check: _ic('<polyline points="20 6 9 17 4 12"/>'),
+  checkCircle: _ic('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'),
+  xCircle: _ic('<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>', 46),
+  checkCircleBig: _ic('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>', 46),
+  lock: _ic('<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'),
+  file: _ic('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>'),
+  book: _ic('<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>'),
+  target: _ic('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>', 12),
+  bulb: _ic('<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.4 1 2.3h6c0-.9.4-1.8 1-2.3A7 7 0 0 0 12 2z"/>'),
+  search: _ic('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'),
+  grid: _ic('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>'),
+  clip: _ic('<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>'),
+  award: _ic('<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>')
+};
 
 /* ---------- DATA MATERI (hardcoded + gambar Wikimedia Commons) ----------
    Tiap materi: pengertian → dasar teori → komponen → langkah → contoh kasus → rangkuman → glosarium.
@@ -788,25 +838,95 @@ var UJIAN = [
   {q:'Perawatan preventif dilakukan…', o:['Sebelum kerusakan terjadi','Setelah gedung runtuh','Saat listrik padam total','Tanpa jadwal'], a:0, why:'Perawatan preventif dilakukan terjadwal sebelum kerusakan terjadi.'}
 ];
 
+/* ---------- BANK SOAL PRETEST (Form A — 20 PG, 5×C1/C2/C3/C4, draf awal) ----------
+   Cakupan: T1 Perencanaan (1-5), T2 Panel (6-10), T3 Pemeliharaan (11-15), T4 SDM (16-20).
+   DRAF: wajib validasi ahli + uji coba (validitas, reliabilitas) sebelum dipakai penelitian. */
+var PRETEST = [
+  {q:'Sebuah gedung yang siap digunakan tersusun atas tiga komponen, yaitu…', o:['Struktur, arsitektur, dan ME','Pondasi, cat, dan ME','Struktur, furnitur, dan ME','Atap, keramik, dan ME'], a:0, why:'Tiga komponen: struktur (kekuatan), arsitektur (keindahan), ME (fungsi).'},
+  {q:'Singkatan ME pada pekerjaan gedung adalah…', o:['Mekanikal & Elektrikal','Mesin & Energi','Material & Estimasi','Manajemen & Eksekusi'], a:0, why:'ME = Mekanikal & Elektrikal.'},
+  {q:'Sebuah gedung megah belum bisa digunakan karena sistem ME belum terpasang. Alasannya…', o:['Tanpa ME gedung tidak punya fungsi utilitas seperti listrik, air, dan pendingin','Tanpa ME gedung kurang indah','Tanpa ME pondasi menjadi lemah','Tanpa ME cat cepat pudar'], a:0, why:'ME menghadirkan fungsi gedung: penerangan, tenaga, tata udara, dan air.'},
+  {q:'Tujuan jasa ME melakukan survei lokasi sebelum menyusun RAB adalah…', o:['Mendapatkan data terperinci kebutuhan instalasi','Menambah biaya proyek','Menunda pekerjaan','Mengganti pemilik gedung'], a:0, why:'Survei menghasilkan data titik beban dan kondisi lapangan.'},
+  {q:'Pemilik meminta rincian biaya material, jasa teknisi, dan sewa alat. Dokumen yang wajib disusun adalah…', o:['Rencana Anggaran Biaya (RAB)','Absensi teknisi','Brosur alat','Surat cuti'], a:0, why:'RAB memuat nilai material, jasa teknisi, dan sewa alat.'},
+  {q:'Peralatan yang memindahkan suplai beban dari PLN ke genset secara otomatis adalah…', o:['ATS (Automatic Transfer Switch)','Stop kontak','Sakelar tunggal','Fitting lampu'], a:0, why:'ATS memindahkan sumber PLN–genset secara otomatis.'},
+  {q:'Komponen panel yang memutus arus saat terjadi beban lebih adalah…', o:['MCB (pengaman)','Lampu indikator','Rel DIN','Label kabel'], a:0, why:'MCB/pengaman memutus arus lebih untuk melindungi kabel dan beban.'},
+  {q:'Survei pembuatan panel berbeda dari survei instalasi umum karena…', o:['Berfokus pada peralatan yang akan dikendalikan','Tidak perlu data lapangan','Hanya menghitung cat','Tanpa konsultasi pemilik'], a:0, why:'Panel dirancang mengikuti peralatan yang dikendalikan, misalnya genset.'},
+  {q:'Total beban 4.400 watt pada tegangan 220 volt menarik arus 20 ampere. Kabel dan MCB yang dipasang harus…', o:['Sesuai batas ukur arus 20 A dengan faktor keamanan','Berukuran bebas berapa pun','Lebih kecil dari 20 A agar hemat','Dipasang tanpa proteksi'], a:0, why:'Kabel dan proteksi dihitung sesuai arus beban dan batas ukurnya (P = V × I).'},
+  {q:'Pemilik menghendaki seluruh gedung disuplai genset otomatis begitu PLN padam. Analisis kebutuhan yang tepat adalah…', o:['Kapasitas genset mencakup seluruh beban + panel ATS + konsultasi cara kerja dengan pemilik','Genset sekecil mungkin tanpa panel','Satu stop kontak tambahan','Tanpa perhitungan apa pun'], a:0, why:'Kebutuhan dianalisis dari total beban, kapasitas genset, panel ATS, dan kesepakatan cara kerja.'},
+  {q:'Perawatan AC gedung dilaksanakan setiap…', o:['3 bulan sekali','3 tahun sekali','Saat rusak saja','Tidak pernah'], a:0, why:'Contoh jadwal pada materi: AC dirawat 3 bulan sekali.'},
+  {q:'Jadwal pengecekan harian peralatan bertujuan…', o:['Mendeteksi kerusakan sejak dini','Menghabiskan jam kerja','Mengganti seluruh panel','Menambah beban listrik'], a:0, why:'Cek harian menemukan kerusakan kecil sebelum membesar.'},
+  {q:'Perbedaan perawatan preventif dan korektif adalah…', o:['Preventif terjadwal sebelum rusak, korektif setelah terjadi kerusakan','Keduanya tanpa jadwal','Korektif selalu lebih murah','Preventif hanya untuk gedung baru'], a:0, why:'Preventif mencegah kerusakan, korektif memperbaiki sesudah rusak.'},
+  {q:'Pompa air gedung mati dan tim internal tidak mampu memperbaikinya. Tindakan yang tepat adalah…', o:['Memesan jasa pihak ketiga yang ahli','Membiarkannya sampai kering','Mengganti dengan ember','Menaikkan tegangan sendiri'], a:0, why:'Kerusakan di luar kemampuan internal di-order ke pihak ketiga.'},
+  {q:'Lampu satu lantai putus berulang tiap dua minggu padahal selalu diganti baru. Analisis teknisi yang tepat adalah…', o:['Memeriksa tegangan jalur, sambungan, dan proteksi karena ada akar masalah','Terus mengganti lampu yang sama','Mematikan seluruh gedung','Mengganti pemilik gedung'], a:0, why:'Kerusakan berulang menandakan masalah pada jalur, tegangan, atau proteksi.'},
+  {q:'Salah satu posisi kerja yang dapat diisi lulusan TITL adalah…', o:['Teknisi instalasi listrik','Dokter gigi','Pilot pesawat','Nakhoda kapal'], a:0, why:'Lulusan TITL mengisi pekerjaan bidang ketenagalistrikan.'},
+  {q:'Urutan alur proyek ME yang benar adalah…', o:['Perencanaan → gambar → survei → RAB → pemasangan → testing → commissioning → pemeliharaan','Pemasangan → survei → RAB → gambar','Testing → survei → RAB → gambar','RAB → testing → survei → gambar'], a:0, why:'Alur: perencanaan, gambar, survei, RAB, pemasangan, testing, commissioning, pemeliharaan.'},
+  {q:'Perusahaan membutuhkan orang yang menghitung biaya proyek instalasi. Tenaga yang tepat adalah…', o:['Estimator yang menyusun RAB','Satpam gerbang','Sopir direksi','Resepsionis'], a:0, why:'Estimator menyusun Rencana Anggaran Biaya.'},
+  {q:'Tugas supervisor pada pekerjaan instalasi di lapangan adalah…', o:['Mengawasi mutu pekerjaan dan keselamatan kerja (K3)','Menyapu area proyek','Menjual material sisa','Mengatur menu kantin'], a:0, why:'Supervisor mengawasi mutu pekerjaan dan K3.'},
+  {q:'Dua penawaran masuk: A murah tanpa SOP pemeliharaan, B sedikit lebih mahal dengan SOP dan jadwal perawatan. Untuk keberlanjutan gedung, analisis yang tepat adalah…', o:['Memilih B karena total biaya jangka panjang lebih rendah dan kerusakan terkendali','Memilih A karena murah di awal','Menolak keduanya tanpa alasan','Memilih secara acak'], a:0, why:'SOP dan jadwal perawatan menekan kerusakan dan biaya jangka panjang.'}
+];
+
+/* ---------- BANK SOAL POSTTEST (Form B — paralel dengan Pretest, draf awal) ---------- */
+var POSTTEST = [
+  {q:'Bagian bangunan yang berfokus pada kekuatan dan kestabilan adalah…', o:['Struktur','Arsitektur','ME','Dekorasi'], a:0, why:'Struktur: pondasi, kolom, balok, dan truss (rangka atap).'},
+  {q:'RAB adalah singkatan dari…', o:['Rencana Anggaran Biaya','Rapat Anggaran Bulanan','Rincian Alat Bengkel','Rekap Absensi Buruh'], a:0, why:'RAB = Rencana Anggaran Biaya.'},
+  {q:'Tujuan presentasi jasa ME di depan pemilik pekerjaan adalah…', o:['Membahas kesesuaian rancangan sampai terjadi kesepakatan','Pamer tanpa diskusi','Menambah harga sepihak','Membatalkan proyek'], a:0, why:'Presentasi membahas bagian yang kurang cocok sampai sepakat.'},
+  {q:'Surat Perintah Kerja (SPK) diterbitkan setelah…', o:['Terjadi kesepakatan antara pemilik dan jasa ME','Gedung selesai dibangun','MCB dipasang','Survei gagal'], a:0, why:'SPK terbit setelah rancangan dan RAB disetujui.'},
+  {q:'Dari gambar denah terdapat 10 titik lampu @20 W dan 4 stop kontak @100 W. Total daya beban adalah…', o:['600 watt','120 watt','400 watt','1.000 watt'], a:0, why:'(10 × 20) + (4 × 100) = 200 + 400 = 600 watt.'},
+  {q:'Genset pada gedung berfungsi sebagai…', o:['Sumber listrik cadangan saat PLN padam','Hiasan halaman','Pengeras suara','Penangkal petir'], a:0, why:'Genset memasok listrik saat sumber utama padam.'},
+  {q:'Perhitungan kabel dan proteksi pada panel sangat penting karena…', o:['Arus berlebih menimbulkan panas dan bahaya kebakaran','Kabel berwarna terlihat menarik','Panel terlihat penuh','Agar tagihan naik'], a:0, why:'Kabel atau proteksi yang salah ukuran berisiko panas dan kebakaran.'},
+  {q:'Beban 4.400 watt / 220 volt = 20 A. Tersedia MCB 10 A dan 25 A. Pilihan yang tepat adalah…', o:['MCB 25 A karena di atas arus beban sesuai batas ukur','MCB 10 A agar cepat trip','Tanpa MCB','Dua MCB 10 A diseri'], a:0, why:'Proteksi dipilih di atas arus beban normal sesuai batas ukurnya.'},
+  {q:'Panel sering trip padahal beban tidak bertambah. Analisis yang tepat adalah…', o:['Memeriksa kemungkinan MCB kekecilan, sambungan longgar, atau beban tak seimbang','Langsung melepas MCB','Menambah beban lagi','Mengganti gedung'], a:0, why:'Trip berulang dianalisis dari ukuran proteksi, sambungan, dan pembagian beban.'},
+  {q:'Ruang server butuh suplai tanpa kedip saat peralihan PLN–genset. Rekomendasi yang tepat adalah…', o:['Panel ATS ditambah UPS untuk beban kritis','Stop kontak biasa','Tanpa panel','Genset tanpa bahan bakar'], a:0, why:'ATS memindahkan sumber, UPS menutup jeda peralihan untuk beban kritis.'},
+  {q:'SOP perawatan gedung dibuat berdasarkan…', o:['Jenis peralatan yang digunakan','Warna dinding','Selera pemilik','Musim liburan'], a:0, why:'SOP disesuaikan dengan peralatan yang dipelihara.'},
+  {q:'Kerusakan boleh ditangani tim internal jika…', o:['Kemampuan, peralatan, dan keselamatan kerja terpenuhi','Kapan pun tanpa alat','Sambil berjalan tanpa APD','Tanpa laporan'], a:0, why:'Penanganan internal hanya bila mampu, beralat, dan aman (K3).'},
+  {q:'Lift berbunyi aneh dan teknisi internal ragu menanganinya. Tindakan yang tepat adalah…', o:['Menghentikan operasi lift dan memanggil pihak ketiga yang ahli','Tetap mengangkut penumpang','Membongkar sendiri tanpa panduan','Menutup kasus'], a:0, why:'Keselamatan utama: hentikan operasi, serahkan ke ahlinya.'},
+  {q:'Untuk gedung dengan lift dan pompa kritis, strategi cek harian rutin dibanding perbaiki-saat-rusak-saja. Analisis yang tepat adalah…', o:['Cek harian rutin karena mencegah kegagalan fatal yang biayanya jauh lebih besar','Perbaiki saat rusak karena paling hemat','Tanpa strategi apa pun','Serahkan ke penghuni'], a:0, why:'Perawatan preventif mencegah kegagalan fatal dan biaya besar.'},
+  {q:'Data kerusakan dari laporan pemilik berguna bagi tim pemelihara untuk…', o:['Bersiaga dan menyiapkan penanganan','Arsip tanpa dibaca','Alasan cuti','Bahan gosip'], a:0, why:'Laporan pemilik menjadi dasar kesiagaan tim pemelihara.'},
+  {q:'Tahap setelah pemasangan instalasi dalam alur proyek ME adalah…', o:['Testing (parsial/holistik)','Survei ulang dari nol','Penawaran baru','Presentasi awal'], a:0, why:'Setelah pemasangan dilakukan testing atau commissioning.'},
+  {q:'Serah terima hasil pekerjaan dilakukan antara…', o:['Pelaksana dan pemilik pekerjaan','Dua siswa','Supplier dan kurir','Guru dan orang tua'], a:0, why:'Serah terima: pelaksana kepada pemilik setelah lulus uji.'},
+  {q:'Drafter dalam tim proyek instalasi bertugas…', o:['Menggambar rancangan instalasi','Mengelas pipa','Menyopir truk','Memasak katering'], a:0, why:'Drafter menggambar rancangan instalasi listrik.'},
+  {q:'Lulusan baru memilih antara helper proyek (belajar alur lengkap) dan operator jaga (gaji awal sedikit lebih tinggi, tugas monoton). Untuk karier teknisi jangka panjang, analisis yang tepat adalah…', o:['Helper proyek karena menguasai alur perencanaan → commissioning → pemeliharaan','Operator jaga karena gaji awal','Menolak keduanya','Memilih acak'], a:0, why:'Penguasaan alur lengkap membangun kompetensi teknisi.'},
+  {q:'Tim pengawas melaporkan mutu pemasangan buruk meski target waktu tercapai. Keputusan yang tepat adalah…', o:['Perbaiki mutu dulu karena keselamatan dan fungsi tidak bisa ditawar waktu','Terima apa adanya demi cepat','Sembunyikan laporan','Ganti pengawas'], a:0, why:'Mutu dan keselamatan (K3) tidak boleh dikorbankan demi kecepatan.'}
+];
+
 /* ---------- BACKEND LAYER (GAS / Local / Dummy) ---------- */
+var GAS_EXEC_URL = 'https://script.google.com/macros/s/AKfycbyGUuoFwItB4LYsWYLCN8HLGLX4bvabtDiPlgHu4BsHKACQuRsWwKhdbqMcuTm1jM7XIA/exec';
+var USE_GAS_DIRECT = true; // localhost tembak langsung ke /exec (Sheets asli)
 var BACKEND = (typeof google !== 'undefined' && google.script && google.script.run) ? 'gas' : 'local';
 var LS_KEY = 'ddk_progress_';
 
 function lsLoad(){ try{ return JSON.parse(localStorage.getItem(LS_KEY+(user?user.nis:''))||'null'); }catch(e){ return null; } }
 function lsSave(p){ try{ localStorage.setItem(LS_KEY+(user?user.nis:''), JSON.stringify(p)); }catch(e){} }
 function emptyProgress(){
-  return { kuis:{kuis1:null,kuis2:null,kuis3:null,kuis4:null}, ujian:null };
+  return { kuis:{kuis1:null,kuis2:null,kuis3:null,kuis4:null}, ujian:null, pretest:null, posttest:null };
 }
 function normalizeProgress(p){
   var e = emptyProgress();
   if(!p) return e;
   ['kuis1','kuis2','kuis3','kuis4'].forEach(function(k){ if(p.kuis && p.kuis[k]) e.kuis[k]=p.kuis[k]; });
   if(p.ujian) e.ujian = p.ujian;
+  if(p.pretest) e.pretest = p.pretest;
+  if(p.posttest) e.posttest = p.posttest;
   return e;
 }
+function gasExec(action, data, cb){
+  fetch(GAS_EXEC_URL, { method:'POST', body: JSON.stringify({ action: action, data: data || {} }) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){ cb(res); })
+    .catch(function(){ cb(null); });
+}
 function apiCall(fnName, payload, cb){
+  // submitPretest/submitPosttest hanya ada sebagai action router /exec & /api;
+  // saat di dalam GAS (HtmlService) petakan ke submitMateriQuiz(payload).
+  var gasFn = (fnName==='submitPretest' || fnName==='submitPosttest') ? 'submitMateriQuiz' : fnName;
   if(BACKEND==='gas'){
-    google.script.run.withSuccessHandler(cb).withFailureHandler(function(){ cb(null); })[fnName](payload);
+    google.script.run.withSuccessHandler(cb).withFailureHandler(function(){ cb(null); })[gasFn](payload);
+  } else if(USE_GAS_DIRECT){
+    gasExec(fnName, payload, function(res){
+      if(res) { cb(res); return; }
+      // fallback lokal bila /exec tidak terjangkau (offline/demo)
+      fetch('/api/'+fnName, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+        .then(function(r){return r.json()}).then(cb).catch(function(){ cb(null); });
+    });
   } else {
     fetch('/api/'+fnName, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       .then(function(r){return r.json()}).then(cb).catch(function(){ cb(null); });
@@ -826,19 +946,29 @@ function saveQuizResult(quizKey, score, total, cb){
   var rec = {best:nilai, passed:nilai>=PASS_SCORE, score:score, total:total, at:new Date().toISOString()};
   // optimistic local
   if(quizKey==='ujian') progress.ujian = rec;
+  else if(quizKey==='pretest') progress.pretest = rec;
+  else if(quizKey==='posttest') progress.posttest = rec;
   else progress.kuis[quizKey] = rec;
   lsSave(progress);
-  apiCall('submitMateriQuiz', {userId:user.id, nis:user.nis, quizKey:quizKey, score:score, total:total}, function(res){
+  var action = (quizKey==='pretest') ? 'submitPretest' : (quizKey==='posttest' ? 'submitPosttest' : 'submitMateriQuiz');
+  apiCall(action, {userId:user.id, nis:user.nis, quizKey:quizKey, score:score, total:total}, function(res){
     if(res && res.success && res.progress){ progress = normalizeProgress(res.progress); lsSave(progress); }
+    else if(res && !res.success){ showToast('Nilai tersimpan lokal, gagal ke server: '+(res.message||'unknown'), 'error'); }
     cb(progress);
   });
 }
 
 /* ---------- GATING ---------- */
 function quizPassed(key){
-  var node = (key==='ujian') ? progress.ujian : progress.kuis[key];
+  var node;
+  if(key==='ujian') node = progress.ujian;
+  else if(key==='pretest') node = progress.pretest;
+  else if(key==='posttest') node = progress.posttest;
+  else node = progress.kuis[key];
   return !!(node && node.passed);
 }
+function isPretestUnlocked(){ return true; }
+function isPosttestUnlocked(){ return quizPassed('pretest'); }
 function isMateriUnlocked(num){
   if(num===1) return true;
   return quizPassed('kuis'+(num-1));
@@ -847,12 +977,16 @@ function isUjianUnlocked(){
   return quizPassed('kuis4');
 }
 function bestScore(key){
-  var node = (key==='ujian') ? progress.ujian : progress.kuis[key];
+  var node;
+  if(key==='ujian') node = progress.ujian;
+  else if(key==='pretest') node = progress.pretest;
+  else if(key==='posttest') node = progress.posttest;
+  else node = progress.kuis[key];
   return node ? node.best : null;
 }
 
 /* ---------- ROUTER ---------- */
-var routes = { dashboard:renderDashboard, materi:renderMateriList, materidetail:renderMateriDetail, kuis:renderKuis, ujian:renderUjian };
+var routes = { dashboard:renderDashboard, materi:renderMateriList, materidetail:renderMateriDetail, kuis:renderKuis, ujian:renderUjian, angket:renderAngket, pretest:renderPretest, posttest:renderPosttest };
 function route(){
   var h = (location.hash||'#/dashboard').replace('#/','');
   var parts = h.split('/');
@@ -887,21 +1021,42 @@ function renderNav(){
     a.setAttribute('data-r','materidetail');
     a.setAttribute('data-arg', String(m.num));
     a.style.opacity = unlocked?1:0.55;
-    a.innerHTML = '<span class="icon">'+(done?'✅':(unlocked?m.num:'🔒'))+'</span> '+m.num+' · '+m.judul.split(' ').slice(0,2).join(' ')+'...';
+    a.innerHTML = '<span class="icon ic">'+(done?ICON.checkCircle:(unlocked?'<span class="num">'+m.num+'</span>':ICON.lock))+'</span> '+m.num+' · '+m.judul.split(' ').slice(0,2).join(' ')+'...';
     if(!unlocked) a.onclick = function(e){ e.preventDefault(); showToast('Selesaikan kuis Materi '+(m.num-1)+' dulu (nilai ≥ '+PASS_SCORE+')','error'); };
     nav.appendChild(a);
   });
   var navU = document.getElementById('navUjian');
   navU.innerHTML='';
+  // Pretest (selalu terbuka) & Posttest (butuh pretest lulus) — Poin A skripsi
+  var preDone = quizPassed('pretest');
+  var pre = document.createElement('a');
+  pre.href = '#/pretest';
+  pre.setAttribute('data-r','pretest');
+  pre.innerHTML = '<span class="icon ic">'+(preDone?ICON.checkCircle:ICON.file)+'</span> Pretest';
+  navU.appendChild(pre);
+  var postUnlocked = isPosttestUnlocked();
+  var postDone = quizPassed('posttest');
+  var po = document.createElement('a');
+  po.href = postUnlocked ? '#/posttest' : '#';
+  po.setAttribute('data-r','posttest');
+  po.style.opacity = postUnlocked?1:0.55;
+  po.innerHTML = '<span class="icon ic">'+(postDone?ICON.checkCircle:(postUnlocked?ICON.file:ICON.lock))+'</span> Posttest';
+  if(!postUnlocked) po.onclick = function(e){ e.preventDefault(); showToast('Kerjakan dan lulus pretest dulu untuk membuka Posttest','error'); };
+  navU.appendChild(po);
   var unlocked = isUjianUnlocked();
   var done = quizPassed('ujian');
   var a = document.createElement('a');
   a.href = unlocked ? '#/ujian' : '#';
   a.setAttribute('data-r','ujian');
   a.style.opacity = unlocked?1:0.55;
-  a.innerHTML = '<span class="icon">'+(done?'🏆':(unlocked?'📝':'🔒'))+'</span> Ujian Akhir';
+  a.innerHTML = '<span class="icon ic">'+(done?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>':(unlocked?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'))+'</span> Ujian Akhir';
   if(!unlocked) a.onclick = function(e){ e.preventDefault(); showToast('Lulus kuis Materi 4 dulu untuk membuka Ujian Akhir','error'); };
   navU.appendChild(a);
+  var b = document.createElement('a');
+  b.href = '#/angket';
+  b.setAttribute('data-r','angket');
+  b.innerHTML = '<span class="icon ic">'+ICON.bulb+'</span> Angket Motivasi';
+  navU.appendChild(b);
 }
 
 /* ---------- RENDER: DASHBOARD ---------- */
@@ -914,10 +1069,10 @@ function renderDashboard(){
   var avgNilai = avg.length ? Math.round(avg.reduce(function(a,b){return a+b;},0)/avg.length) : null;
 
   var html = ''
-  + '<div class="badge-pill" style="margin-bottom:12px">📗 Interaktif · '+user.kelas+' · NIS '+user.nis+'</div>'
+  + '<div class="badge-pill" style="margin-bottom:12px">'+ICON.book+' Interaktif · '+user.kelas+' · NIS '+user.nis+'</div>'
   + '<div class="hero"><div>'
   + '<div class="hero-title">Kuasai DDK, materi demi <span>materi</span>, sampai <span>siap ujian</span>.</div>'
-  + '<div class="hero-desc">4 modul materi + kuis di akhir tiap materi (lulus ≥ '+PASS_SCORE+' untuk lanjut) + <strong>Ujian Akhir</strong> 20 soal. Halaman selalu terbuka di HP.</div>'
+  + '<div class="hero-desc">Pretest 20 soal → 4 modul materi + kuis tiap materi (lulus ≥ '+PASS_SCORE+' untuk lanjut) → <strong>Posttest</strong> 20 soal → <strong>Ujian Akhir</strong>. Halaman selalu terbuka di HP.</div>'
   + '<div class="hero-cta">'+nextActionCta()+'</div>'
   + '</div>'
   + panelProgres()
@@ -930,9 +1085,9 @@ function renderDashboard(){
   + '</div>'
   + '<div class="section-why"><h2>Kenapa wajib bisa DDK?</h2>'
   + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px" class="grid-3">'
-  + '<div><strong>⚡ Alur jasa ME nyata</strong><br><small style="color:var(--muted)">Penawaran, survei, RAB, panel, sampai pemeliharaan — sesuai kurikulum DDK Kelas X TITL.</small></div>'
-  + '<div><strong>🧠 Kuis antar materi</strong><br><small style="color:var(--muted)">Lulus kuis (≥ '+PASS_SCORE+') untuk membuka materi berikutnya — belajar bertahap terkontrol.</small></div>'
-  + '<div><strong>📈 Nilai terpantau guru</strong><br><small style="color:var(--muted)">Semua nilai kuis & ujian tampil di dashboard guru secara real-time.</small></div>'
+  + '<div><strong><svg style="display:inline;vertical-align:middle;margin-right:4px" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Alur jasa ME nyata</strong><br><small style="color:var(--muted)">Penawaran, survei, RAB, panel, sampai pemeliharaan — sesuai kurikulum DDK Kelas X TITL.</small></div>'
+  + '<div><strong><svg style="display:inline;vertical-align:middle;margin-right:4px" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 5 5c0 3-2 5-5 7-3-2-5-4-5-7a5 5 0 0 1 5-5z"/><path d="M12 14c-4 2-6 5-6 8h12c0-3-2-6-6-8z"/></svg> Kuis antar materi</strong><br><small style="color:var(--muted)">Lulus kuis (≥ '+PASS_SCORE+') untuk membuka materi berikutnya — belajar bertahap terkontrol.</small></div>'
+  + '<div><strong><svg style="display:inline;vertical-align:middle;margin-right:4px" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> Nilai terpantau guru</strong><br><small style="color:var(--muted)">Semua nilai kuis & ujian tampil di dashboard guru secara real-time.</small></div>'
   + '</div></div>'
   + '<div class="materi-list" id="dashMateri"></div>';
   document.getElementById('main').innerHTML = html;
@@ -940,13 +1095,16 @@ function renderDashboard(){
 }
 
 function nextActionCta(){
+  var playSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+  if(!quizPassed('pretest')) return '<a class="btn-hero-primary" href="#/pretest">'+playSvg+' Kerjakan Pretest</a>';
   for(var i=1;i<=4;i++){
     if(!quizPassed('kuis'+i)){
-      if(isMateriUnlocked(i)) return '<a class="btn-hero-primary" href="#/materidetail/'+i+'">▶ Lanjut Materi '+i+'</a>';
+      if(isMateriUnlocked(i)) return '<a class="btn-hero-primary" href="#/materidetail/'+i+'">'+playSvg+' Lanjut Materi '+i+'</a>';
     }
   }
-  if(!quizPassed('ujian')) return '<a class="btn-hero-primary" href="#/ujian">🏆 Kerjakan Ujian Akhir</a>';
-  return '<a class="btn-hero-primary" href="#/materi">📚 Review Materi</a>';
+  if(!quizPassed('posttest') && isPosttestUnlocked()) return '<a class="btn-hero-primary" href="#/posttest">'+playSvg+' Kerjakan Posttest</a>';
+  if(!quizPassed('ujian')) return '<a class="btn-hero-primary" href="#/ujian"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Kerjakan Ujian Akhir</a>';
+  return '<a class="btn-hero-primary" href="#/materi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Review Materi</a>';
 }
 
 function renderMateriCards(containerId){
@@ -959,13 +1117,13 @@ function renderMateriCards(containerId){
     var div = document.createElement('div');
     div.className = 'materi-card' + (passed?' done':'') + (unlocked?'':' locked');
     div.innerHTML = ''
-      + (passed ? '<span class="done-tag">✓ Lulus</span>' : (unlocked?'':'<span class="lock-tag">🔒 Terkunci</span>'))
+      + (passed ? '<span class="done-tag">'+ICON.check+' Lulus</span>' : (unlocked?'':'<span class="lock-tag">'+ICON.lock+' Terkunci</span>'))
       + '<div style="display:flex;gap:10px;align-items:center"><div class="materi-num">'+m.num+'</div><h3>'+m.judul+'</h3></div>'
       + '<small style="color:var(--muted)">'+m.sections.length+' bagian · kuis '+m.kuis.length+' soal</small>'
       + (bestScore('kuis'+m.num)!==null ? '<small>Nilai kuis terbaik: <strong>'+bestScore('kuis'+m.num)+'</strong></small>' : '')
       + '<div style="margin-top:auto">'+(unlocked
           ? '<a class="btn btn-outline" href="#/materidetail/'+m.num+'" style="width:100%">'+(passed?'Baca ulang':'Buka materi')+' →</a>'
-          : '<button class="btn btn-outline" style="width:100%" disabled>🔒 Selesaikan kuis materi '+(m.num-1)+'</button>')
+          : '<button class="btn btn-outline" style="width:100%" disabled>'+ICON.lock+' Selesaikan kuis materi '+(m.num-1)+'</button>')
       + '</div>';
     c.appendChild(div);
   });
@@ -975,6 +1133,17 @@ function renderMateriCards(containerId){
    Metafora panel listrik DDK (busbar + MCB), bukan kartu spreadsheet. */
 function panelProgres(){
   var rows = '';
+  // Pretest & Posttest (Poin A skripsi) di atas materi
+  [['pretest','Tes Awal'],['posttest','Tes Akhir']].forEach(function(pp){
+    var onP = quizPassed(pp[0]);
+    var nilaiP = bestScore(pp[0]);
+    var stP = onP ? 'LULUS' : ((pp[0]==='posttest' && !isPosttestUnlocked()) ? 'TERKUNCI' : 'MENUNGGU');
+    rows += '<div class="breaker '+(onP?'on':'off')+'">'
+      + '<span class="lamp"></span><span class="tag">'+(pp[0]==='pretest'?'P0':'P1')+'</span>'
+      + '<span class="name">'+pp[1]+'</span>'
+      + '<span class="val">'+(nilaiP===null?'—':nilaiP)+'</span>'
+      + '<span class="state">'+stP+'</span></div>';
+  });
   MATERI.forEach(function(m){
     var on = quizPassed('kuis'+m.num);
     var nilai = bestScore('kuis'+m.num);
@@ -997,15 +1166,15 @@ function panelProgres(){
   var avg = [];
   ['kuis1','kuis2','kuis3','kuis4'].forEach(function(k){ if(progress.kuis[k]) avg.push(progress.kuis[k].best); });
   var avgNilai = avg.length ? Math.round(avg.reduce(function(a,b){return a+b;},0)/avg.length) : null;
-  var semuaLulus = ['kuis1','kuis2','kuis3','kuis4','ujian'].every(function(k){ return quizPassed(k); });
+  var semuaLulus = ['pretest','posttest','kuis1','kuis2','kuis3','kuis4','ujian'].every(function(k){ return quizPassed(k); });
 
   return '<div class="panel">'
-    + '<div class="panel-head"><div class="panel-title"><span class="bolt">⚡</span> Panel Progres Belajar</div>'
+    + '<div class="panel-head"><div class="panel-title"><span class="bolt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> Panel Progres Belajar</div>'
     + '<span class="panel-tag">DDK · X TITL</span></div>'
     + '<div class="panel-body"><div class="busbar"></div>' + rows
     + '<div class="panel-foot">'
     + '<div><div class="label">Rata-rata nilai kuis</div><div class="readout">'+(avgNilai===null?'—':avgNilai)+'</div></div>'
-    + '<div style="text-align:right"><div class="label">Status</div><div class="readout" style="font-size:15px">'+(semuaLulus?'LULUS 🎉':'BELAJAR')+'</div></div>'
+    + '<div style="text-align:right"><div class="label">Status</div><div class="readout" style="font-size:15px">'+(semuaLulus?'LULUS':'BELAJAR')+'</div></div>'
     + '</div></div></div>';
 }
 
@@ -1027,15 +1196,15 @@ function renderBlocks(blocks){
       + '</tr></thead><tbody>'
       + (b.rows||[]).map(function(r){ return '<tr>'+r.map(function(cl){ return '<td>'+cl+'</td>'; }).join('')+'</tr>'; }).join('')
       + '</tbody></table></div>';
-    if(b.t==='note') return '<div class="blk-note"><strong>🔎 '+(b.title||'')+'</strong><div>'+b.text+'</div></div>';
-    if(b.t==='case') return '<div class="blk-case"><strong>🧩 '+(b.title||'')+'</strong><div>'+b.text+'</div></div>';
+    if(b.t==='note') return '<div class="blk-note"><strong>'+ICON.search+(b.title||'')+'</strong><div>'+b.text+'</div></div>';
+    if(b.t==='case') return '<div class="blk-case"><strong>'+ICON.grid+(b.title||'')+'</strong><div>'+b.text+'</div></div>';
     if(b.t==='formula') return '<div class="blk-formula">'+(b.text||'')+'</div>';
     return '<p>'+(b.text||'')+'</p>';
   }).join('');
 }
 function renderGlosarium(g){
   if(!g || !g.length) return '';
-  return '<div class="glossary"><div class="glossary-title">📖 Glosarium Istilah</div>'
+  return '<div class="glossary"><div class="glossary-title">'+ICON.book+' Glosarium Istilah</div>'
     + g.map(function(x){ return '<div class="glossary-row"><span class="glossary-term">'+x.istilah+'</span><span class="glossary-arti">'+x.arti+'</span></div>'; }).join('')
     + '</div>';
 }
@@ -1045,7 +1214,7 @@ function renderMateriDetail(num){
   var m = MATERI.find(function(x){return x.num===Number(num);});
   if(!m){ go('/dashboard'); return; }
   if(!isMateriUnlocked(m.num)){
-    document.getElementById('main').innerHTML = '<div class="locked-note">🔒 Materi ini terkunci. Lulus kuis Materi '+(m.num-1)+' (nilai ≥ '+PASS_SCORE+') dulu ya. <a href="#/dashboard">Kembali ke dashboard</a></div>';
+    document.getElementById('main').innerHTML = '<div class="locked-note">'+ICON.lock+' Materi ini terkunci. Lulus kuis Materi '+(m.num-1)+' (nilai ≥ '+PASS_SCORE+') dulu ya. <a href="#/dashboard">Kembali ke dashboard</a></div>';
     return;
   }
   var passed = quizPassed('kuis'+m.num);
@@ -1060,37 +1229,79 @@ function renderMateriDetail(num){
   + '<div class="card materi-hero-card" style="margin-top:12px">'
   + '<img class="materi-banner" src="'+m.img.src+'" alt="'+m.img.cap+'" loading="lazy">'
   + '<div class="materi-hero-body">'
-  + '<div class="badge-pill">🎯 Tujuan Pembelajaran</div>'
+  + '<div class="badge-pill">'+ICON.target+' Tujuan Pembelajaran</div>'
   + '<p style="margin-top:10px">'+m.tujuan+'</p>'
   + '<div class="img-credit">'+m.img.credit+'</div>'
   + '</div></div>'
   + '<div class="card materi-content">'+secHtml
-  + '<div class="rangkuman"><strong>📌 Rangkuman</strong><br>'+m.rangkuman+'</div>'
+  + '<div class="rangkuman"><strong>'+ICON.clip+' Rangkuman</strong><br>'+m.rangkuman+'</div>'
   + renderGlosarium(m.glosarium)
   + '</div>'
   + '<div class="card">'
   + (passed
-      ? '<span class="pill pill-pass">✓ Kuis lulus — nilai '+bestScore('kuis'+m.num)+'</span> <a class="btn btn-outline" style="margin-left:8px" onclick="startQuiz(\'kuis'+m.num+'\')">Ulangi kuis (latihan)</a>'
-      : '<button class="btn-hero-primary" onclick="startQuiz(\'kuis'+m.num+'\')">📝 Kerjakan Kuis Materi '+m.num+' ('+m.kuis.length+' soal)</button>')
+      ? '<span class="pill pill-pass">'+ICON.check+' Kuis lulus — nilai '+bestScore('kuis'+m.num)+'</span> <a class="btn btn-outline" style="margin-left:8px" onclick="startQuiz(\'kuis'+m.num+'\')">Ulangi kuis (latihan)</a>'
+      : '<button class="btn-hero-primary" onclick="startQuiz(\'kuis'+m.num+'\')">'+ICON.file+' Kerjakan Kuis Materi '+m.num+' ('+m.kuis.length+' soal)</button>')
   + '</div>';
   document.getElementById('main').innerHTML = html;
 }
 
 /* ---------- RENDER: UJIAN ---------- */
+/* ---------- RENDER: PRETEST & POSTTEST (Poin A skripsi, 20 PG C1-C4) ---------- */
+function renderPretest(){
+  var nilai = bestScore('pretest');
+  var html = ''
+  + '<div class="badge-pill" style="margin-bottom:12px">'+ICON.file+' Evaluasi · Pretest</div>'
+  + '<div class="hero"><div><div class="hero-title">Tes <span>Awal</span> DDK.</div>'
+  + '<div class="hero-desc">20 soal pilihan ganda untuk mengukur pengetahuan awal (C1 mengingat – C4 menganalisis). Nilai kelulusan ≥ '+PASS_SCORE+'. Lulus pretest membuka Posttest.</div>'
+  + '<div class="hero-cta"><button class="btn-hero-primary" onclick="startQuiz(\'pretest\')"> Kerjakan Pretest</button></div>'
+  + (nilai!==null ? '<small style="display:block;margin-top:10px">Nilai terbaik kamu: <strong>'+nilai+'</strong></small>' : '')
+  + '</div><div class="panel">'
+  + '<div class="panel-head"><div class="panel-title"><span class="bolt">'+ICON.file+'</span> Lembar Pretest</div>'
+  + '<span class="panel-tag">KKTP '+PASS_SCORE+'</span></div>'
+  + '<div class="panel-body"><div class="busbar"></div>'
+  + '<div class="kv-row"><span class="kv-label">Jumlah soal</span><span class="kv-val">'+PRETEST.length+' pilihan ganda</span></div>'
+  + '<div class="kv-row"><span class="kv-label">Cakupan materi</span><span class="kv-val">4 modul</span></div>'
+  + '<div class="kv-row"><span class="kv-label">Nilai terbaik kamu</span><span class="kv-val" style="color:var(--primary)">'+(nilai===null?'—':nilai)+'</span></div>'
+  + '</div></div></div>';
+  document.getElementById('main').innerHTML = html;
+}
+function renderPosttest(){
+  if(!isPosttestUnlocked()){
+    document.getElementById('main').innerHTML = '<div class="locked-note">'+ICON.lock+' Posttest terbuka setelah kamu lulus Pretest. <a href="#/pretest">Kerjakan Pretest</a></div>';
+    return;
+  }
+  var nilai = bestScore('posttest');
+  var html = ''
+  + '<div class="badge-pill" style="margin-bottom:12px">'+ICON.file+' Evaluasi · Posttest</div>'
+  + '<div class="hero"><div><div class="hero-title">Tes <span>Akhir</span> DDK.</div>'
+  + '<div class="hero-desc">20 soal pilihan ganda paralel dengan pretest untuk mengukur peningkatan hasil belajar. Nilai kelulusan ≥ '+PASS_SCORE+'.</div>'
+  + '<div class="hero-cta"><button class="btn-hero-primary" onclick="startQuiz(\'posttest\')"> Kerjakan Posttest</button></div>'
+  + (nilai!==null ? '<small style="display:block;margin-top:10px">Nilai terbaik kamu: <strong>'+nilai+'</strong></small>' : '')
+  + '</div><div class="panel">'
+  + '<div class="panel-head"><div class="panel-title"><span class="bolt">'+ICON.file+'</span> Lembar Posttest</div>'
+  + '<span class="panel-tag">KKTP '+PASS_SCORE+'</span></div>'
+  + '<div class="panel-body"><div class="busbar"></div>'
+  + '<div class="kv-row"><span class="kv-label">Jumlah soal</span><span class="kv-val">'+POSTTEST.length+' pilihan ganda</span></div>'
+  + '<div class="kv-row"><span class="kv-label">Cakupan materi</span><span class="kv-val">4 modul</span></div>'
+  + '<div class="kv-row"><span class="kv-label">Nilai terbaik kamu</span><span class="kv-val" style="color:var(--primary)">'+(nilai===null?'—':nilai)+'</span></div>'
+  + '</div></div></div>';
+  document.getElementById('main').innerHTML = html;
+}
+
 function renderUjian(){
   if(!isUjianUnlocked()){
-    document.getElementById('main').innerHTML = '<div class="locked-note">🔒 Ujian Akhir terbuka setelah kamu lulus kuis Materi 4. <a href="#/dashboard">Kembali ke dashboard</a></div>';
+    document.getElementById('main').innerHTML = '<div class="locked-note">'+ICON.lock+' Ujian Akhir terbuka setelah kamu lulus kuis Materi 4. <a href="#/dashboard">Kembali ke dashboard</a></div>';
     return;
   }
   var nilai = bestScore('ujian');
   var html = ''
-  + '<div class="badge-pill" style="margin-bottom:12px">🏆 Evaluasi Akhir</div>'
+  + '<div class="badge-pill" style="margin-bottom:12px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Evaluasi Akhir</div>'
   + '<div class="hero"><div><div class="hero-title">Ujian <span>Akhir</span> DDK.</div>'
   + '<div class="hero-desc">20 soal pilihan ganda mencakup seluruh materi (Perencanaan, Panel, Pemeliharaan, SDM). Nilai kelulusan ≥ '+PASS_SCORE+'.</div>'
-  + '<div class="hero-cta"><button class="btn-hero-primary" onclick="startQuiz(\'ujian\')">▶ Mulai Ujian</button></div>'
+  + '<div class="hero-cta"><button class="btn-hero-primary" onclick="startQuiz(\'ujian\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Mulai Ujian</button></div>'
   + (nilai!==null ? '<small style="display:block;margin-top:10px">Nilai terbaik kamu: <strong>'+nilai+'</strong></small>' : '')
   + '</div><div class="panel">'
-  + '<div class="panel-head"><div class="panel-title"><span class="bolt">⚡</span> Lembar Ujian Akhir</div>'
+  + '<div class="panel-head"><div class="panel-title"><span class="bolt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> Lembar Ujian Akhir</div>'
   + '<span class="panel-tag">KKTP '+PASS_SCORE+'</span></div>'
   + '<div class="panel-body"><div class="busbar"></div>'
   + '<div class="kv-row"><span class="kv-label">Jumlah soal</span><span class="kv-val">'+UJIAN.length+' pilihan ganda</span></div>'
@@ -1101,13 +1312,34 @@ function renderUjian(){
   document.getElementById('main').innerHTML = html;
 }
 
+/* ---------- RENDER: ANGKET MOTIVASI (Google Form embed) ---------- */
+var ANGKET_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeQxmREwD_Bjnj8WYMdttHqBdZt9o0IH29HIIHe5tGHzBijDg/viewform?embedded=true';
+function renderAngket(){
+  var html = ''
+  + '<div class="badge-pill" style="margin-bottom:12px">'+ICON.bulb+' Evaluasi · Angket Motivasi</div>'
+  + '<h1>Angket Motivasi Belajar</h1>'
+  + '<small>Isi angket berikut dengan jujur. Jawabanmu dipakai untuk penelitian, bukan untuk nilai rapor.</small>'
+  + '<div class="hero-cta" style="margin:12px 0"><a class="btn-hero-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSeQxmREwD_Bjnj8WYMdttHqBdZt9o0IH29HIIHe5tGHzBijDg/viewform" target="_blank" rel="noopener">'+ICON.bulb+' Buka di Tab Baru</a></div>'
+  + '<div class="card" style="padding:8px;overflow:hidden">'
+  + '<iframe src="'+ANGKET_URL+'" width="100%" height="3712" frameborder="0" marginheight="0" marginwidth="0" loading="lazy" title="Angket Motivasi" style="width:100%;max-width:680px;display:block;margin:0 auto;border:0">Memuat…</iframe>'
+  + '</div>';
+  document.getElementById('main').innerHTML = html;
+}
+
 /* ---------- KUIS & UJIAN — halaman penuh (bukan modal) ---------- */
 var quiz = null;
 
 // Halaman kembali: sumber kuis kalau keluar sebelum selesai.
-function kuisKembali(key){ return key==='ujian' ? '/ujian' : '/materidetail/'+String(key).replace('kuis',''); }
+function kuisKembali(key){
+  if(key==='ujian') return '/ujian';
+  if(key==='pretest') return '/pretest';
+  if(key==='posttest') return '/posttest';
+  return '/materidetail/'+String(key).replace('kuis','');
+}
 // Halaman lanjutan setelah hasil tampil.
 function kuisLanjut(key, nomor, isUjian, passed){
+  if(key==='pretest') return passed ? { href:'#/materidetail/1', label:'Mulai Materi 1 →' } : { href:'#/pretest', label:'Coba Pretest lagi' };
+  if(key==='posttest') return passed ? { href:'#/dashboard', label:'Ke Dashboard' } : { href:'#/posttest', label:'Coba Posttest lagi' };
   if(!passed) return { href:'#'+kuisKembali(key), label:'Kembali ke materi' };
   if(isUjian) return { href:'#/dashboard', label:'Ke Dashboard' };
   if(nomor < MATERI.length) return { href:'#/materidetail/'+(nomor+1), label:'Materi '+(nomor+1)+' →' };
@@ -1119,17 +1351,24 @@ function startQuiz(key){ go('/kuis/'+key); }
 function renderKuis(key){
   var main = document.getElementById('main');
   var isUjian = key==='ujian';
+  var isPre = key==='pretest';
+  var isPost = key==='posttest';
   var nomor = Number(String(key).replace('kuis',''));
   if(isUjian && !isUjianUnlocked()){
-    main.innerHTML = '<div class="locked-note">🔒 Ujian Akhir terbuka setelah kamu lulus kuis Materi 4. <a href="#/dashboard">Kembali ke dashboard</a></div>';
+    main.innerHTML = '<div class="locked-note">'+ICON.lock+' Ujian Akhir terbuka setelah kamu lulus kuis Materi 4. <a href="#/dashboard">Kembali ke dashboard</a></div>';
     return;
   }
-  if(!isUjian && (!MATERI[nomor-1] || !isMateriUnlocked(nomor))){
-    main.innerHTML = '<div class="locked-note">🔒 Kuis ini terkunci. Lulus kuis sebelumnya dulu (nilai ≥ '+PASS_SCORE+'). <a href="#/dashboard">Kembali ke dashboard</a></div>';
+  if(isPost && !isPosttestUnlocked()){
+    main.innerHTML = '<div class="locked-note">'+ICON.lock+' Posttest terbuka setelah kamu lulus Pretest. <a href="#/pretest">Kerjakan Pretest</a></div>';
     return;
   }
-  var qs = isUjian ? UJIAN : MATERI[nomor-1].kuis;
-  quiz = { key:key, isUjian:isUjian, nomor:nomor, qs:qs, idx:0, ans:new Array(qs.length).fill(null), done:false };
+  if(!isUjian && !isPre && !isPost && (!MATERI[nomor-1] || !isMateriUnlocked(nomor))){
+    main.innerHTML = '<div class="locked-note">'+ICON.lock+' Kuis ini terkunci. Lulus kuis sebelumnya dulu (nilai ≥ '+PASS_SCORE+'). <a href="#/dashboard">Kembali ke dashboard</a></div>';
+    return;
+  }
+  var qs = isUjian ? UJIAN : (isPre ? PRETEST : (isPost ? POSTTEST : MATERI[nomor-1].kuis));
+  var label = isUjian ? 'Ujian Akhir' : (isPre ? 'Pretest' : (isPost ? 'Posttest' : 'Kuis Materi '+nomor));
+  quiz = { key:key, isUjian:isUjian, nomor:nomor, label:label, qs:qs, idx:0, ans:new Array(qs.length).fill(null), done:false };
   drawKuis();
 }
 
@@ -1149,14 +1388,14 @@ function drawKuis(){
   + '<div class="quiz-page">'
   + '<div class="quiz-top">'
   + '<a class="quiz-exit" href="#'+kuisKembali(quiz.key)+'">← Keluar</a>'
-  + '<div class="quiz-top-title">'+(quiz.isUjian?'🏆 Ujian Akhir':'📝 Kuis Materi '+quiz.nomor)+'</div>'
+  + '<div class="quiz-top-title">'+(quiz.isUjian?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Ujian Akhir':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> '+(quiz.label||('Kuis Materi '+quiz.nomor)))+'</div>'
   + '<span class="badge-pill">Soal '+(quiz.idx+1)+'/'+quiz.qs.length+'</span>'
   + '</div>'
   + '<div class="progress" style="margin:12px 0 14px"><div class="progress-bar green" style="width:'+(jawab/quiz.qs.length*100)+'%"></div></div>'
   + '<div class="card quiz-card-full">'
   + '<div class="quiz-q">'+q.q+'</div>'
   + '<div class="quiz-opts">'+opts+'</div>'
-  + '<div class="why-box" id="whyBox" style="'+(quiz.ans[quiz.idx]!==null && q.why ? 'display:block' : '')+'">'+(q.why?'💡 '+q.why:'')+'</div>'
+  + '<div class="why-box" id="whyBox" style="'+(quiz.ans[quiz.idx]!==null && q.why ? 'display:block' : '')+'">'+(q.why?ICON.bulb+' '+q.why:'')+'</div>'
   + '</div>'
   + '<div class="card quiz-nav-wrap">'
   + '<div class="quiz-nav-title"><span>Navigasi soal</span><span class="quiz-answered-bar">'+jawab+'/'+quiz.qs.length+' terjawab</span></div>'
@@ -1206,7 +1445,7 @@ function quizResult(){
         + '<div><b>'+(i+1)+'. '+q.q+'</b></div>'
         + '<div>Jawabanmu: '+(quiz.ans[i]===null?'—':String.fromCharCode(65+quiz.ans[i]))
         + ' · Jawaban benar: <b>'+String.fromCharCode(65+q.a)+'. '+q.o[q.a]+'</b></div>'
-        + (q.why ? '<div class="quiz-review-why">💡 '+q.why+'</div>' : '')
+        + (q.why ? '<div class="quiz-review-why">'+ICON.bulb+' '+q.why+'</div>' : '')
         + '</div>';
     }
   });
@@ -1214,11 +1453,14 @@ function quizResult(){
 
   document.getElementById('main').innerHTML = ''
   + '<div class="quiz-page"><div class="card quiz-result">'
-  + '<div style="font-size:46px">'+(passed?'🎉':'😅')+'</div>'
+  + '<div style="display:flex;justify-content:center;color:'+(passed?'var(--success)':'var(--accent)')+'">'+(passed?ICON.checkCircleBig:ICON.xCircle)+'</div>'
   + '<h2 style="margin:8px 0">Nilai kamu: '+nilai+'</h2>'
   + '<small>Benar '+score+' dari '+quiz.qs.length+' soal · KKTP '+PASS_SCORE+'</small><br><br>'
   + (passed
-      ? (isUjian ? '<span class="pill pill-pass">🏆 Selamat! Ujian Akhir selesai</span>' : '<span class="pill pill-pass">Materi berikutnya terbuka!</span>')
+      ? (isUjian ? '<span class="pill pill-pass">'+ICON.award+' Selamat! Ujian Akhir selesai</span>'
+        : (key==='pretest' ? '<span class="pill pill-pass">Materi 1 & Posttest terbuka!</span>'
+        : (key==='posttest' ? '<span class="pill pill-pass">'+ICON.award+' Selamat! Posttest selesai</span>'
+        : '<span class="pill pill-pass">Materi berikutnya terbuka!</span>')))
       : '<span class="pill pill-fail">Belum lulus — pelajari lagi materinya</span>')
   + '<div style="display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap">'
   + '<button class="btn btn-outline" onclick="startQuiz(\''+key+'\')">Coba lagi</button>'
@@ -1230,7 +1472,7 @@ function quizResult(){
 
   saveQuizResult(key, score, quiz.qs.length, function(){
     renderNav();
-    if(passed){ showToast((isUjian?'Ujian':'Kuis materi '+nomor)+' lulus! Nilai: '+nilai, 'success'); }
+    if(passed){ showToast((isUjian?'Ujian':(key==='pretest'?'Pretest':(key==='posttest'?'Posttest':'Kuis materi '+nomor)))+' lulus! Nilai: '+nilai, 'success'); }
   });
 }
 
@@ -1238,7 +1480,9 @@ function quizResult(){
 function doLogout(){
   var nis = user ? user.nis : null;
   var finish = function(){ localStorage.removeItem('user'); localStorage.removeItem('nis'); location.href='../'; };
-  if(BACKEND==='gas' && nis){ google.script.run.withSuccessHandler(finish).logout(nis); } else { finish(); }
+  if(BACKEND==='gas' && nis){ google.script.run.withSuccessHandler(finish).logout(nis); }
+  else if(USE_GAS_DIRECT && nis){ gasExec('logout', { nis: nis }, function(){ finish(); }); }
+  else { finish(); }
 }
 
 function init(){

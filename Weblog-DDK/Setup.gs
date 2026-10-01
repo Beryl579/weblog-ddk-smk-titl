@@ -94,19 +94,7 @@ function seedUsers() {
     registered_at: now(),
     is_active: true
   });
-  // Siswa demo (login dummy untuk uji coba: 2024001 / siswa123)
-  insertRow('users', {
-    id: 3,
-    nis: '2024001',
-    nama: 'Siswa Contoh',
-    kelas: 'X TITL 1',
-    role: 'siswa',
-    is_eksperimen: true,
-    password_hash: hashPassword('siswa123'),
-    registered_at: now(),
-    is_active: true
-  });
-  Logger.log('seed users OK — guru: GURU001/guru123, admin: ADMIN001/admin123, siswa demo: 2024001/siswa123');
+  Logger.log('seed users OK — guru: GURU001/guru123, admin: ADMIN001/admin123');
 }
 
 function seedMaterials() {

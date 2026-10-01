@@ -26,6 +26,7 @@
 
 const PASS_SCORE = 75;
 const QUIZ_KEYS = ['kuis1', 'kuis2', 'kuis3', 'kuis4'];
+const PREPOST_KEYS = ['pretest', 'posttest']; // Poin A: numpang sheet progress, tanpa tabel baru
 
 function makeProgressApi(db) {
   function saveDb() { db.saveDb(); }
@@ -53,9 +54,9 @@ function makeProgressApi(db) {
   }
 
   function normalize(rows) {
-    const progress = { kuis: { kuis1: null, kuis2: null, kuis3: null, kuis4: null }, ujian: null };
+    const progress = { kuis: { kuis1: null, kuis2: null, kuis3: null, kuis4: null }, ujian: null, pretest: null, posttest: null };
     for (const r of rows) {
-      const key = String(r.quiz_key || '').trim();
+      const key = String(r.quiz_key || '').trim().toLowerCase();
       const node = {
         best: Number(r.best_score) || 0,
         passed: String(r.passed).toLowerCase() === 'true' || r.passed === true,
@@ -64,6 +65,8 @@ function makeProgressApi(db) {
         attempts: Number(r.attempts) || 1
       };
       if (key === 'ujian') progress.ujian = node;
+      else if (key === 'pretest') progress.pretest = node;
+      else if (key === 'posttest') progress.posttest = node;
       else if (QUIZ_KEYS.includes(key)) progress.kuis[key] = node;
     }
     return progress;
@@ -85,11 +88,15 @@ function makeProgressApi(db) {
       total = parseInt(total, 10) || 0;
       const user = userId ? findRow('users', 'id', userId) : (nis ? findRow('users', 'nis', nis) : null);
       if (!user) return { success: false, message: 'User tidak ditemukan' };
-      if (!QUIZ_KEYS.includes(quizKey) && quizKey !== 'ujian') return { success: false, message: 'quizKey tidak valid' };
+      const validKeys = QUIZ_KEYS.concat(['ujian'], PREPOST_KEYS);
+      if (!validKeys.includes(quizKey)) return { success: false, message: 'quizKey tidak valid' };
       if (total <= 0) return { success: false, message: 'total soal tidak valid' };
 
-      // Gating server-side
-      if (quizKey !== 'kuis1' && quizKey !== 'ujian') {
+      // Gating server-side: posttest butuh pretest lulus; materi/ujian seperti semula
+      if (quizKey === 'posttest' && !isQuizPassed(user.id, 'pretest')) {
+        return { success: false, message: 'Kerjakan dan lulus pretest terlebih dahulu!' };
+      }
+      if (quizKey !== 'kuis1' && quizKey !== 'ujian' && quizKey !== 'pretest' && quizKey !== 'posttest') {
         const prev = 'kuis' + (parseInt(quizKey.replace('kuis', ''), 10) - 1);
         if (!isQuizPassed(user.id, prev)) return { success: false, message: 'Kuis sebelumnya belum lulus (KKTP ' + PASS_SCORE + ')' };
       }
@@ -119,7 +126,7 @@ function makeProgressApi(db) {
         });
       }
 
-      insertRow('activity_logs', { id: getNextId('activity_logs'), user_id: user.id, action: quizKey === 'ujian' ? 'submit_ujian' : 'submit_kuis', target_id: user.id, timestamp: now() });
+      insertRow('activity_logs', { id: getNextId('activity_logs'), user_id: user.id, action: quizKey === 'ujian' ? 'submit_ujian' : (quizKey === 'pretest' ? 'submit_pretest' : (quizKey === 'posttest' ? 'submit_posttest' : 'submit_kuis')), target_id: user.id, timestamp: now() });
       saveDb();
 
       const fresh = findRows('progress', 'user_id', user.id);
@@ -139,7 +146,8 @@ function makeProgressApi(db) {
           nis: s.nis, nama: s.nama, kelas: s.kelas, materi_selesai: 0,
           kuis1: null, kuis2: null, kuis3: null, kuis4: null,
           kuis1_passed: false, kuis2_passed: false, kuis3_passed: false, kuis4_passed: false,
-          ujian: null, rata_kuis: null
+          ujian: null, rata_kuis: null,
+          pretest: null, posttest: null, pretest_passed: false, posttest_passed: false, n_gain: null
         };
         const kuisVals = [];
         for (let k = 1; k <= 4; k++) {
@@ -153,6 +161,9 @@ function makeProgressApi(db) {
           }
         }
         if (map['ujian']) d.ujian = Number(map['ujian'].best_score) || 0;
+        if (map['pretest']) { d.pretest = Number(map['pretest'].best_score) || 0; d.pretest_passed = String(map['pretest'].passed).toLowerCase() === 'true' || map['pretest'].passed === true; }
+        if (map['posttest']) { d.posttest = Number(map['posttest'].best_score) || 0; d.posttest_passed = String(map['posttest'].passed).toLowerCase() === 'true' || map['posttest'].passed === true; }
+        if (d.pretest !== null && d.posttest !== null && (100 - d.pretest) !== 0) d.n_gain = Number(((d.posttest - d.pretest) / (100 - d.pretest)).toFixed(2));
         if (kuisVals.length) d.rata_kuis = Math.round(kuisVals.reduce((a, b) => a + b, 0) / kuisVals.length);
         return d;
       });

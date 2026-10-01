@@ -1,71 +1,105 @@
 /**
- * Code.gs — Router utama doGet/doPost
- * Halaman: login (public), dashboard (siswa), guru (dashboard guru).
- * SPA menangani navigasi internal via hash (#/...).
+ * Code.gs — Headless REST API Gateway untuk Weblog DDK (Netlify Frontend)
+ * Menerima request HTTP (POST/GET) dari website di Netlify
+ * dan merespon dalam format JSON murni via ContentService.
  */
 
-function doGet(e) {
-  try {
-    var page = (e && e.parameter && e.parameter.page) ? String(e.parameter.page).toLowerCase().trim() : 'login';
-
-    var validPages = ['login', 'dashboard', 'guru'];
-    if (validPages.indexOf(page) === -1) page = 'login';
-
-    var fileMap = {
-      'login': 'Views/Login',
-      'dashboard': 'Views/DashboardSiswa',
-      'guru': 'Views/DashboardGuru'
-    };
-
-    var template = HtmlService.createTemplateFromFile(fileMap[page]);
-    return template.evaluate()
-      .setTitle('Weblog DDK')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-
-  } catch (err) {
-    Logger.log('doGet error: ' + err.message);
-    return HtmlService.createHtmlOutput('<h3>Error: ' + err.message + '</h3><a href="?page=login">Ke Login</a>');
-  }
-}
-
+/**
+ * Endpoint Utama: Menerima HTTP POST dari Netlify
+ */
 function doPost(e) {
   try {
-    return doGet(e);
+    var contents = (e && e.postData && e.postData.contents) ? e.postData.contents : '{}';
+    var payload = {};
+    try {
+      payload = JSON.parse(contents);
+    } catch (parseErr) {
+      payload = e.parameter || {};
+    }
+
+    var action = String(payload.action || (e && e.parameter && e.parameter.action) || '').trim();
+    var data = payload.data || payload;
+
+    var result = handleApiAction(action, data);
+    return createJsonResponse(result);
+
   } catch (err) {
-    return HtmlService.createHtmlOutput('doPost error: ' + err.message);
+    return createJsonResponse({
+      success: false,
+      message: 'Server Error: ' + err.message
+    });
   }
 }
 
 /**
- * include(filename) — untuk <?!= include('Styles/Main') ?> dll
+ * Endpoint Tambahan: Menerima HTTP GET (bisa untuk uji coba di browser)
  */
-function include(filename) {
+function doGet(e) {
   try {
-    return HtmlService.createHtmlOutputFromFile(filename).getContent();
-  } catch (e1) {
-    try {
-      return HtmlService.createHtmlOutputFromFile('Components/' + filename).getContent();
-    } catch (e2) {
-      try {
-        return HtmlService.createHtmlOutputFromFile('Styles/' + filename).getContent();
-      } catch (e3) {
-        Logger.log('include failed for ' + filename + ': ' + e3.message);
-        return '<!-- include ' + filename + ' not found -->';
-      }
+    var params = (e && e.parameter) ? e.parameter : {};
+    var action = String(params.action || 'ping').trim();
+
+    if (action === 'ping') {
+      return createJsonResponse({
+        success: true,
+        message: 'Backend API Weblog DDK Aktif!',
+        timestamp: new Date().toISOString()
+      });
     }
+
+    var result = handleApiAction(action, params);
+    return createJsonResponse(result);
+
+  } catch (err) {
+    return createJsonResponse({
+      success: false,
+      message: 'Server Error: ' + err.message
+    });
   }
 }
 
-/* ============ Client API wrappers (dipanggil via google.script.run) ============ */
+/**
+ * Router Logika Bisnis: Memanggil fungsi sesuai aksi (action)
+ */
+function handleApiAction(action, data) {
+  switch (action) {
+    // 1. Otentikasi
+    case 'login':
+      return login(data.nis, data.password);
 
-// Auth
-function clientGetCurrentUser(data) { return getCurrentUser(data ? data.nis : null) ? { success: true, user: getCurrentUser(data.nis) } : { success: false }; }
-function clientRegister(data) { return register(data.nis, data.nama, data.kelas, data.password, data.confirmPassword); }
-function clientLogin(data) { return login(data.nis, data.password); }
-function clientLogout(data) { return logout(data ? data.nis : null); }
+    case 'register':
+      return register(data.nis, data.nama, data.kelas, data.password, data.confirmPassword || data.pw2);
 
-// Progres siswa & rekap guru
-function clientGetStudentProgress(data) { return getStudentProgress(data); }
-function clientSubmitMateriQuiz(data) { return submitMateriQuiz(data); }
-function clientGetGuruOverview(data) { return getGuruOverview(data); }
+    case 'getCurrentUser':
+      var u = getCurrentUser(data.nis);
+      return u ? { success: true, user: u } : { success: false, message: 'Sesi habis' };
+
+    case 'logout':
+      return logout(data.nis);
+
+    // 2. Progres Siswa & Gating Kuis
+    case 'getStudentProgress':
+      return getStudentProgress(data);
+
+    case 'submitMateriQuiz':
+      return submitMateriQuiz(data);
+
+    // 3. Dashboard Guru
+    case 'getGuruOverview':
+      return getGuruOverview(data);
+
+    default:
+      return {
+        success: false,
+        message: 'Action "' + action + '" tidak dikenali'
+      };
+  }
+}
+
+/**
+ * Helper: Mengembalikan respon dalam format JSON resmi
+ */
+function createJsonResponse(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}

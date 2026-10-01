@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png">
+<link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <title>Weblog DDK — Login / Daftar</title>
 <style><?!= include('Styles/Main') ?></style>
 <style>
@@ -19,15 +23,15 @@
   .msg.err{display:block;background:#fdeef0;color:#a12a3a;border:1px solid #f8d3d8}
   .msg.ok{display:block;background:#e9f7ee;color:#0a7a2e;border:1px solid #cdebd7}
   .msg.info{display:block;background:#eef3fb;color:#2a4a8a;border:1px solid #d6e2f5}
-  .demo-box{margin-top:14px;background:#f6fbf6;border:1px dashed #c8e6c9;border-radius:12px;padding:12px;font-size:12px;color:var(--muted)}
-  .demo-box code{background:#e6f3e6;color:#166534;padding:2px 8px;border-radius:6px;font-weight:700}
 </style>
 </head>
 <body>
 <div class="auth-wrap">
   <div class="auth-card">
     <div class="brand">
-      <div class="logo-icon">⚡</div>
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
       <div>
         <div class="name">Weblog DDK</div>
         <div class="sub">Dasar-Dasar Ketenagalistrikan · SMK TR 2 Sinar Husni</div>
@@ -83,18 +87,23 @@
       <button class="btn-hero-primary" style="width:100%;justify-content:center;margin-top:8px" id="btnDaftar" type="submit">Daftar</button>
       <div style="text-align:center;margin-top:10px"><small>Sudah punya akun? <a href="#" onclick="switchTab('login');return false" style="font-weight:700">Masuk di sini</a></small></div>
     </form>
-
-    <div class="demo-box" id="demoBox">
-      <strong>Akun demo:</strong> siswa <code>2024001 / siswa123</code> · guru <code>GURU001 / guru123</code><br>
-      <span style="opacity:0.8">Saat deploy GAS, akun tersimpan di Sheet <em>users</em>.</span>
-    </div>
   </div>
 </div>
 
 <?!= include('Components/Toast') ?>
 
 <script>
+var GAS_EXEC_URL = 'https://script.google.com/macros/s/AKfycbyGUuoFwItB4LYsWYLCN8HLGLX4bvabtDiPlgHu4BsHKACQuRsWwKhdbqMcuTm1jM7XIA/exec';
+var USE_GAS_DIRECT = true; // localhost tembak langsung ke /exec (Sheets asli)
 var BACKEND = (typeof google !== 'undefined' && google.script && google.script.run) ? 'gas' : 'local';
+
+// POST langsung ke Apps Script tanpa preflight CORS (body text/plain).
+function gasExec(action, data, cb, failCb){
+  fetch(GAS_EXEC_URL, { method:'POST', body: JSON.stringify({ action: action, data: data || {} }) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){ if(cb) cb(res); })
+    .catch(function(err){ if(failCb) failCb(err); else if(cb) cb(null); });
+}
 
 function switchTab(t){
   document.getElementById('tabLogin').classList.toggle('active', t==='login');
@@ -128,6 +137,17 @@ function gotoByRole(user){
           if(res && res.success) gotoByRole(u);
           else localStorage.removeItem('user');
         }).getCurrentUser(String(u.nis));
+      } else if(USE_GAS_DIRECT){
+        gasExec('getCurrentUser', { nis: String(u.nis) }, function(res){
+          if(res && res.success) gotoByRole(u);
+          else {
+            var role = String(u.role||'siswa').toLowerCase();
+            location.href = (role==='guru'||role==='admin') ? '?page=guru' : '?page=dashboard';
+          }
+        }, function(){
+          var role = String(u.role||'siswa').toLowerCase();
+          location.href = (role==='guru'||role==='admin') ? '?page=guru' : '?page=dashboard';
+        });
       } else {
         // local: langsung masuk (session divalidasi server saat API call)
         var role = String(u.role||'siswa').toLowerCase();
@@ -162,6 +182,8 @@ function doLogin(ev){
 
   if(BACKEND==='gas'){
     google.script.run.withSuccessHandler(done).withFailureHandler(fail).login(nis, pw);
+  } else if(USE_GAS_DIRECT){
+    gasExec('login', { nis: nis, password: pw }, done, fail);
   } else {
     fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nis:nis,password:pw})})
       .then(function(r){return r.json()}).then(done).catch(fail);
@@ -195,6 +217,8 @@ function doDaftar(ev){
 
   if(BACKEND==='gas'){
     google.script.run.withSuccessHandler(done).withFailureHandler(fail).register(nis, nama, kelas, pw, pw2);
+  } else if(USE_GAS_DIRECT){
+    gasExec('register', { nis: nis, nama: nama, kelas: kelas, password: pw, confirmPassword: pw2 }, done, fail);
   } else {
     fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nis:nis,nama:nama,kelas:kelas,password:pw,confirmPassword:pw2})})
       .then(function(r){return r.json()}).then(done).catch(fail);

@@ -1,0 +1,3 @@
+# Netlify Redirects / Reverse Proxy untuk Weblog DDK
+# Meneruskan panggilan /api/<action> langsung ke Google Apps Script tanpa CORS issue
+/api/*  https://script.google.com/macros/s/AKfycbyGUuoFwItB4LYsWYLCN8HLGLX4bvabtDiPlgHu4BsHKACQuRsWwKhdbqMcuTm1jM7XIA/exec?action=:splat  200!

@@ -49,11 +49,33 @@ node local/build-static.js
 
 Setelan Pages: **Settings → Pages → Source: Deploy from a branch → `main` → `/ (root)`**.
 
+## Versi satu file untuk Blogger
+
+`blogger/weblog-ddk.html` adalah gabungan login + dashboard siswa + dashboard guru +
+backend demo dalam **satu berkas HTML mandiri** (semua CSS & JS di-inline, tanpa berkas
+pendamping). Cocok ditempel ke Blogger:
+
+1. Buka berkasnya, salin seluruh isinya.
+2. Di Blogger: **Layout → Tambah Gadget → HTML/JavaScript → tempel → Simpan**
+   (alternatif: **Pages → New Page** pada mode tampilan HTML).
+3. Selesai — data demo tersimpan di `localStorage` browser masing-masing pengunjung.
+
+Secara default flag `DDK_DEMO_ONLY = true` membuat panggilan langsung ke Apps Script
+(`/exec`) dialihkan ke backend demo di dalam berkas, jadi satu file ini jalan offline.
+Ubah menjadi `false` di dalam berkas hasil jika ingin memakai data Sheet asli.
+
+Regenerasi setelah mengubah view atau backend demo:
+
+```bash
+node local/build-blogger.js
+```
+
 ## Struktur repo
 
 ```
 ├── index.html, dashboard/, guru/   ← hasil build versi statis (GitHub Pages)
 ├── ddk-demo.js                     ← backend tiruan untuk versi statis
+├── blogger/weblog-ddk.html         ← hasil build versi satu file (untuk Blogger)
 ├── Weblog-DDK/                     ← proyek Google Apps Script (sumber utama)
 │   ├── *.gs                        ← router, auth, progres, setup Sheet
 │   ├── Views/                      ← Login, DashboardSiswa, DashboardGuru
