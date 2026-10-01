@@ -184,7 +184,10 @@ a:hover{text-decoration:underline}
   .sidebar{width:100%; height:auto; position:relative; display:none}
   .sidebar.open{display:flex}
   .main{padding:16px}
-  .hamburger{display:flex !important}
+  /* Tombol hamburger melayang TIDAK dipakai lagi (satu-satunya pemicu menu
+     adalah tombol di mobile-topbar) — aturan display:flex lama dihapus agar
+     tidak muncul menu ganda di HP. */
+  .hamburger{display:none !important}
 }
 .hamburger{
   display:none; align-items:center; justify-content:center;
@@ -367,6 +370,68 @@ tbody tr:hover{background:#fafdfa}
 }
 .fab:hover{transform:scale(1.05)}
 
+/* ===== Optimasi Mobile / Smartphone (360px+) =====
+   Sasaran: tombol mudah disentuh (min 44px), teks terbaca tanpa zoom,
+   tidak ada menu ganda, tabel bisa digeser, toast tidak menutupi layar. */
+img{max-width:100%;height:auto}
+*{ -webkit-tap-highlight-color:transparent; }
+body{ overflow-wrap:anywhere; }
+
+@media(max-width:900px){
+  /* Topbar sudah punya tombol menu sendiri -> tombol hamburger melayang disembunyikan
+     agar tidak menumpuk/menutupi konten di HP. */
+  .hamburger{ display:none !important; }
+  .mobile-topbar{ position:sticky; top:0; z-index:55; }
+
+  /* --- Sidebar sebagai drawer overlay (bukan mendorong konten) ---
+     Menu melayang di atas konten, punya scroll sendiri, konten belakang terkunci. */
+  .sidebar{
+    display:flex;
+    position:fixed; top:0; left:0; bottom:0;
+    width:min(300px, 85vw); height:100dvh; max-height:100dvh;
+    z-index:70;
+    transform:translateX(-105%);
+    transition:transform 0.25s ease;
+    overflow-y:auto; overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    box-shadow:none;
+  }
+  .sidebar.open{ transform:none; box-shadow:8px 0 30px rgba(0,0,0,0.35); }
+  .sidebar-backdrop{
+    display:none;
+    position:fixed; inset:0; z-index:65;
+    background:rgba(10,25,15,0.5);
+    border:none; padding:0; cursor:pointer;
+  }
+  .sidebar-backdrop.show{ display:block; }
+  body.menu-open{ overflow:hidden; } /* kunci scroll konten belakang saat menu terbuka */
+
+  .main{ padding:14px 12px 90px; } /* ruang bawah agar tidak tertutup FAB/toast */
+  .hero-title{ font-size:26px; }
+  .hero-cta .btn-hero-primary, .hero-cta .btn-hero-outline{ flex:1 1 100%; justify-content:center; }
+  .table-wrap{ -webkit-overflow-scrolling:touch; }
+  table{ font-size:12px; }
+  th,td{ padding:8px 10px; }
+  .toast{ left:12px; right:12px; top:12px; text-align:center; }
+}
+
+@media(max-width:600px){
+  body{ font-size:15px; } /* keterbacaan di layar kecil */
+  h1{ font-size:19px; }
+  h2{ font-size:16px; }
+  .hero-title{ font-size:24px; line-height:1.15; }
+  .hero-desc{ font-size:13px; }
+  /* Cegah auto-zoom iOS: input minimal 16px */
+  .input, select.input, textarea.input{ font-size:16px; padding:12px; }
+  .btn, .btn-hero-primary, .btn-hero-outline{ min-height:48px; font-size:15px; }
+  .btn-hero-primary, .btn-hero-outline{ padding:12px 16px; }
+  .card{ padding:14px; border-radius:14px; }
+  .panel-body{ padding:12px; }
+  .breaker .name{ font-size:12px; }
+  .stat-number{ font-size:24px; }
+  .fab{ bottom:16px; right:16px; width:52px; height:52px; }
+}
+
 body{background:var(--bg)}
   .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
   .auth-card{width:100%;max-width:440px;background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px;box-shadow:var(--shadow-card)}
@@ -380,6 +445,13 @@ body{background:var(--bg)}
   .msg.err{display:block;background:#fdeef0;color:#a12a3a;border:1px solid #f8d3d8}
   .msg.ok{display:block;background:#e9f7ee;color:#0a7a2e;border:1px solid #cdebd7}
   .msg.info{display:block;background:#eef3fb;color:#2a4a8a;border:1px solid #d6e2f5}
+  @media(max-width:600px){
+    .auth-wrap{padding:16px 12px}
+    .auth-card{padding:20px;border-radius:16px}
+    .input, select.input{font-size:16px} /* cegah auto-zoom iOS */
+    .btn-hero-primary{min-height:48px}
+    .seg button{min-height:44px}
+  }
 
 .materi-hero-card{padding:0;overflow:hidden;margin-top:12px}
   .materi-banner{width:100%;height:240px;object-fit:cover;object-position:center;display:block;background:#eef4ee}
@@ -443,6 +515,21 @@ body{background:var(--bg)}
   .pill-pass{background:#e6f7ec;color:#0a7a2e}
   .pill-fail{background:#fdeef0;color:#a12a3a}
   .locked-note{background:#fff8e6;border:1px solid #f3dfa0;color:#7a5b00;border-radius:12px;padding:12px 14px;font-size:13px;margin:12px 0}
+  /* ===== Kuis & materi ramah HP ===== */
+  .quiz-opts button{min-height:48px}
+  .quiz-nav button{min-height:44px;font-size:13px;font-weight:700}
+  @media(max-width:600px){
+    .quiz-page{max-width:100%}
+    .quiz-card-full{padding:14px}
+    .quiz-q{font-size:15px}
+    .quiz-opts button{font-size:15px;padding:13px 12px}
+    .quiz-foot{flex-wrap:wrap}
+    .quiz-foot .btn, .quiz-foot .btn-hero-primary{flex:1 1 100%;justify-content:center}
+    .quiz-nav-wrap{padding:12px}
+    .materi-hero-body{padding:14px}
+    .materi-content p,.materi-content ul{font-size:15px}
+    .blk-formula{font-size:12px}
+  }
 
 .guru-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
   .guru-card{width:100%;max-width:400px;background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px;box-shadow:var(--shadow-card)}
@@ -578,15 +665,14 @@ body{background:var(--bg)}
     <div class="sidebar-footer"><small id="sbUser">...</small><br><small style="opacity:0.7">SMK TR 2 Sinar Husni</small></div>
   </aside>
 
-  <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Menu">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-  </button>
+  <div class="sidebar-backdrop" id="sbBackdrop" onclick="toggleSidebar(false)" aria-hidden="true"></div>
+
   <div class="mobile-topbar">
     <div style="display:flex;align-items:center;gap:8px">
       <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
       <strong>Weblog DDK</strong>
     </div>
-    <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;color:#fff;display:flex;align-items:center" aria-label="Menu">
+    <button onclick="toggleSidebar();return false;" style="background:none;border:none;color:#fff;display:flex;align-items:center;min-height:44px;min-width:44px;justify-content:center" aria-label="Buka menu">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
   </div>
@@ -1426,18 +1512,18 @@ var MATERI = [
     {istilah:'BOQ', arti:'Bill of Quantity — daftar volume/kuantitas material suatu pekerjaan.'}
   ],
   kuis:[
-    {q:'Jasa ME mendapat tawaran pekerjaan instalasi listrik dari…', o:['Pemilik gedung atau kontraktor utama','Siswa SMK','Perusahaan asuransi','Pemasok kabel'], a:0, why:'Pekerjaan instalasi ditawarkan oleh pemilik gedung/kontraktor utama; jasa ME menjadi sub-kontraktor.'},
-    {q:'Tujuan utama survei sebelum pemasangan instalasi adalah…', o:['Menghibur pemilik gedung','Memperoleh data terperinci kebutuhan instalasi','Menjual material listrik','Merekrut teknisi baru'], a:1, why:'Survei menghasilkan data terperinci: titik lampu, stop kontak, panel, jalur kabel.'},
-    {q:'Dokumen yang memuat nilai material, jasa teknisi, dan sewa alat disebut…', o:['SPK','RAB','BA (Berita Acara)','Invoice'], a:1, why:'Rencana Anggaran Biaya (RAB) memuat biaya material, jasa, dan sewa alat.'},
-    {q:'Presentasi rancangan dilakukan bertujuan…', o:['Mengganti kontraktor','Mencapai kesepakatan dengan pemilik pekerjaan','Melatih teknisi','Menghitung pajak'], a:1, why:'Presentasi adalah forum pembahasan sampai tercapai kesepakatan.'},
-    {q:'Setelah presentasi disetujui, kontraktor menerima…', o:['SPK (Surat Perintah Kerja)','Sertifikat lahan','Izin PSDB','Polis asuransi'], a:0, why:'SPK diterbitkan sebagai dasar pelaksanaan pekerjaan, disertai tim pengawas.'},
-    {q:'Urutan tahapan pelaksanaan pekerjaan ME yang benar…', o:['Tes → Persiapan → Pelaksanaan','Persiapan → Pelaksanaan → Tes/Commissioning','Pelaksanaan → Persiapan → Tes','Commissioning → Pelaksanaan → Persiapan'], a:1, why:'Persiapan (alat/bahan/tenaga) → Pelaksanaan → Tes/Commissioning.'},
-    {q:'Pengujian yang dilakukan pada sebagian sistem disebut pengujian…', o:['Holistik','Parsial','Total','Akhir'], a:1, why:'Commissioning parsial menguji bagian per bagian; holistik menguji keseluruhan.'},
-    {q:'Serah terima pekerjaan dilakukan antara…', o:['Teknisi dengan supplier','Pelaksana dengan pemilik pekerjaan','Dua kontraktor sub','Guru dengan siswa'], a:1, why:'Setelah lulus uji, pekerjaan diserahterimakan dari pelaksana ke pemilik pekerjaan.'},
-    {q:'Bagian bangunan yang mengutamakan FUNGSI adalah bagian…', o:['Struktur','Arsitektur','ME (Mekanikal & Elektrikal)','Landscape'], a:2, why:'Struktur fokus kekuatan, arsitektur fokus keindahan, ME fokus fungsi/utilitas.'},
-    {q:'Singkatan MEP menambahkan bidang… dibanding ME.', o:['Pertambangan','Plumbing (perpipaan)','Penerbangan','Perkebunan'], a:1, why:'MEP = Mekanikal, Elektrikal, Plumbing; plumbing = sistem perpipaan/sanitasi.'},
-    {q:'Rangka batang segitiga penyusun struktur atap disebut…', o:['Truss','Busbar','Relay','RAB'], a:0, why:'Truss (rangka batang) menyusun struktur atap dan menjadi acuan peletakan titik lampu/jalur kabel.'},
-    {q:'Pola dasar aliran listrik dalam gedung adalah…', o:['Beban → panel → sumber','Sumber → panel → beban','Panel → sumber → beban','Beban → sumber → panel'], a:1, why:'Listrik mengalir dari sumber (PLN/genset) ke panel, lalu dibagi ke beban.'}
+    {q:"Presentasi rancangan dilakukan bertujuan…", o:["Mengganti kontraktor", "Menghitung pajak", "Melatih teknisi", "Mencapai kesepakatan dengan pemilik pekerjaan"], a:3, why:"Presentasi adalah forum pembahasan sampai tercapai kesepakatan."},
+    {q:"Dokumen yang memuat nilai material, jasa teknisi, dan sewa alat disebut…", o:["RAB", "BA (Berita Acara)", "Invoice", "SPK"], a:0, why:"Rencana Anggaran Biaya (RAB) memuat biaya material, jasa, dan sewa alat."},
+    {q:"Tujuan utama survei sebelum pemasangan instalasi adalah…", o:["Memperoleh data terperinci kebutuhan instalasi", "Merekrut teknisi baru", "Menjual material listrik", "Menghibur pemilik gedung"], a:0, why:"Survei menghasilkan data terperinci: titik lampu, stop kontak, panel, jalur kabel."},
+    {q:"Bagian bangunan yang mengutamakan FUNGSI adalah bagian…", o:["ME (Mekanikal & Elektrikal)", "Struktur", "Landscape", "Arsitektur"], a:0, why:"Struktur fokus kekuatan, arsitektur fokus keindahan, ME fokus fungsi/utilitas."},
+    {q:"Setelah presentasi disetujui, kontraktor menerima…", o:["Izin PSDB", "Polis asuransi", "Sertifikat lahan", "SPK (Surat Perintah Kerja)"], a:3, why:"SPK diterbitkan sebagai dasar pelaksanaan pekerjaan, disertai tim pengawas."},
+    {q:"Singkatan MEP menambahkan bidang… dibanding ME.", o:["Plumbing (perpipaan)", "Penerbangan", "Pertambangan", "Perkebunan"], a:0, why:"MEP = Mekanikal, Elektrikal, Plumbing; plumbing = sistem perpipaan/sanitasi."},
+    {q:"Pengujian yang dilakukan pada sebagian sistem disebut pengujian…", o:["Akhir", "Parsial", "Holistik", "Total"], a:1, why:"Commissioning parsial menguji bagian per bagian; holistik menguji keseluruhan."},
+    {q:"Urutan tahapan pelaksanaan pekerjaan ME yang benar…", o:["Pelaksanaan → Persiapan → Tes", "Tes → Persiapan → Pelaksanaan", "Commissioning → Pelaksanaan → Persiapan", "Persiapan → Pelaksanaan → Tes/Commissioning"], a:3, why:"Persiapan (alat/bahan/tenaga) → Pelaksanaan → Tes/Commissioning."},
+    {q:"Jasa ME mendapat tawaran pekerjaan instalasi listrik dari…", o:["Perusahaan asuransi", "Pemilik gedung atau kontraktor utama", "Siswa SMK", "Pemasok kabel"], a:1, why:"Pekerjaan instalasi ditawarkan oleh pemilik gedung/kontraktor utama; jasa ME menjadi sub-kontraktor."},
+    {q:"Pola dasar aliran listrik dalam gedung adalah…", o:["Sumber → panel → beban", "Beban → panel → sumber", "Panel → sumber → beban", "Beban → sumber → panel"], a:0, why:"Listrik mengalir dari sumber (PLN/genset) ke panel, lalu dibagi ke beban."},
+    {q:"Rangka batang segitiga penyusun struktur atap disebut…", o:["Busbar", "Relay", "Truss", "RAB"], a:2, why:"Truss (rangka batang) menyusun struktur atap dan menjadi acuan peletakan titik lampu/jalur kabel."},
+    {q:"Serah terima pekerjaan dilakukan antara…", o:["Dua kontraktor sub", "Teknisi dengan supplier", "Pelaksana dengan pemilik pekerjaan", "Guru dengan siswa"], a:2, why:"Setelah lulus uji, pekerjaan diserahterimakan dari pelaksana ke pemilik pekerjaan."}
   ]
 },
 {
@@ -1503,18 +1589,18 @@ var MATERI = [
     {istilah:'Busbar', arti:'Penghantar utama (tembaga/aluminium) pembagi arus di dalam panel.'}
   ],
   kuis:[
-    {q:'Panel kendali pensaklaran beban berfungsi untuk…', o:['Menghias ruang panel','Mengendalikan perpindahan sumber PLN ke genset','Menyimpan kabel cadangan','Mengukur suhu ruangan'], a:1, why:'Panel ini mengendalikan pensaklaran (perpindahan) beban dari PLN ke genset.'},
-    {q:'Fokus survei saat pembuatan panel adalah…', o:['Warna panel','Peralatan yang akan dikendalikan','Harga makan siang teknisi','Jumlah jendela gedung'], a:1, why:'Survei difokuskan pada peralatan yang dikendalikan, misalnya genset.'},
-    {q:'Perhitungan proteksi panel (MCB/relay) dibuat…', o:['Sesuai batas ukur','Sembarangan','Sebesar mungkin','Tanpa perhitungan'], a:0, why:'Perhitungan peralatan, kabel, dan proteksi harus sesuai batas ukur agar aman.'},
-    {q:'Cara kerja panel sebelum dibuat sebaiknya…', o:['Dirahasiakan','Dikonsultasikan dengan pemilik pekerjaan','Diacak','Dititipkan ke supplier'], a:1, why:'Konsultasi memastikan panel sesuai kebutuhan dan harapan pemilik.'},
-    {q:'Gedung yang otomatis beralih ke genset saat PLN padam menggunakan…', o:['ATS (Automatic Transfer Switch)','Kapasitor bank','Trafo step-down','Sekring'], a:0, why:'ATS memindahkan sumber otomatis saat pemadaman terjadi.'},
-    {q:'Sebelum membuat panel, teknisi harus menghitung…', o:['Jumlah karyawan','Peralatan, kabel, dan proteksi','Biaya iklan','Luas atap'], a:1, why:'Perhitungan peralatan, kabel, dan proteksi adalah inti perencanaan panel.'},
-    {q:'Contoh kasus di materi: setelah pemadaman, panel harus…', o:['Mematikan seluruh gedung','Mensuplai arus ke seluruh gedung secara otomatis','Menunggu instruksi manual setiap saat','Memutus semua rangkaian'], a:1, why:'Pemilik menghendaki genset otomatis mensuplai seluruh gedung saat PLN padam.'},
-    {q:'Alat ukur yang tepat untuk memeriksa tegangan panel adalah…', o:['Meteran kain','Multimeter','Termometer','Barometer'], a:1, why:'Multimeter mengukur tegangan, arus, dan resistansi pada panel.'},
-    {q:'Panel yang membagi pasokan utama ke beberapa kelompok beban disebut…', o:['MDP','ATS','TOR','Truss'], a:0, why:'MDP (Main Distribution Panel) membagi pasokan utama; SDP membagi ke kelompok cabang.'},
-    {q:'Alat yang MENYALAKAN genset otomatis saat PLN gagal adalah…', o:['ATS','AMF','MCB','Busbar'], a:1, why:'AMF (Automatic Main Failure) menyalakan genset otomatis saat PLN gagal.'},
-    {q:'Interlock pada panel dua sumber berfungsi…', o:['Mempercepat genset','Mencegah PLN & genset terhubung bersamaan','Menambah beban','Mengurangi tegangan'], a:1, why:'Interlock mencegah dua sumber terhubung bersamaan agar tidak terjadi hubung singkat.'},
-    {q:'Kemampuan Hantar Arus (KHA) berkaitan dengan…', o:['Warna kabel','Batas arus aman sebuah kabel','Harga panel','Jumlah lampu'], a:1, why:'KHA adalah batas arus aman yang boleh dilewatkan sebuah kabel.'}
+    {q:"Fokus survei saat pembuatan panel adalah…", o:["Warna panel", "Harga makan siang teknisi", "Peralatan yang akan dikendalikan", "Jumlah jendela gedung"], a:2, why:"Survei difokuskan pada peralatan yang dikendalikan, misalnya genset."},
+    {q:"Sebelum membuat panel, teknisi harus menghitung…", o:["Peralatan, kabel, dan proteksi", "Biaya iklan", "Jumlah karyawan", "Luas atap"], a:0, why:"Perhitungan peralatan, kabel, dan proteksi adalah inti perencanaan panel."},
+    {q:"Contoh kasus di materi: setelah pemadaman, panel harus…", o:["Mematikan seluruh gedung", "Mensuplai arus ke seluruh gedung secara otomatis", "Menunggu instruksi manual setiap saat", "Memutus semua rangkaian"], a:1, why:"Pemilik menghendaki genset otomatis mensuplai seluruh gedung saat PLN padam."},
+    {q:"Perhitungan proteksi panel (MCB/relay) dibuat…", o:["Tanpa perhitungan", "Sebesar mungkin", "Sembarangan", "Sesuai batas ukur"], a:3, why:"Perhitungan peralatan, kabel, dan proteksi harus sesuai batas ukur agar aman."},
+    {q:"Alat yang MENYALAKAN genset otomatis saat PLN gagal adalah…", o:["ATS", "AMF", "Busbar", "MCB"], a:1, why:"AMF (Automatic Main Failure) menyalakan genset otomatis saat PLN gagal."},
+    {q:"Panel kendali pensaklaran beban berfungsi untuk…", o:["Menghias ruang panel", "Menyimpan kabel cadangan", "Mengendalikan perpindahan sumber PLN ke genset", "Mengukur suhu ruangan"], a:2, why:"Panel ini mengendalikan pensaklaran (perpindahan) beban dari PLN ke genset."},
+    {q:"Alat ukur yang tepat untuk memeriksa tegangan panel adalah…", o:["Termometer", "Barometer", "Multimeter", "Meteran kain"], a:2, why:"Multimeter mengukur tegangan, arus, dan resistansi pada panel."},
+    {q:"Gedung yang otomatis beralih ke genset saat PLN padam menggunakan…", o:["Kapasitor bank", "Sekring", "ATS (Automatic Transfer Switch)", "Trafo step-down"], a:2, why:"ATS memindahkan sumber otomatis saat pemadaman terjadi."},
+    {q:"Cara kerja panel sebelum dibuat sebaiknya…", o:["Dititipkan ke supplier", "Dikonsultasikan dengan pemilik pekerjaan", "Dirahasiakan", "Diacak"], a:1, why:"Konsultasi memastikan panel sesuai kebutuhan dan harapan pemilik."},
+    {q:"Panel yang membagi pasokan utama ke beberapa kelompok beban disebut…", o:["TOR", "Truss", "MDP", "ATS"], a:2, why:"MDP (Main Distribution Panel) membagi pasokan utama; SDP membagi ke kelompok cabang."},
+    {q:"Interlock pada panel dua sumber berfungsi…", o:["Mengurangi tegangan", "Mempercepat genset", "Mencegah PLN & genset terhubung bersamaan", "Menambah beban"], a:2, why:"Interlock mencegah dua sumber terhubung bersamaan agar tidak terjadi hubung singkat."},
+    {q:"Kemampuan Hantar Arus (KHA) berkaitan dengan…", o:["Warna kabel", "Batas arus aman sebuah kabel", "Harga panel", "Jumlah lampu"], a:1, why:"KHA adalah batas arus aman yang boleh dilewatkan sebuah kabel."}
   ]
 },
 {
@@ -1578,18 +1664,18 @@ var MATERI = [
     {istilah:'Downtime', arti:'Waktu ketika peralatan tidak beroperasi (berhenti).'}
   ],
   kuis:[
-    {q:'SOP perawatan disusun…', o:['Sama untuk semua alat','Sesuai peralatan yang digunakan','Hanya untuk AC','Sekali seumur hidup'], a:1, why:'SOP harus disesuaikan karakteristik tiap peralatan.'},
-    {q:'Jadwal perawatan AC yang umum adalah…', o:['3 tahun sekali','3 bulan sekali','3 hari sekali','10 tahun sekali'], a:1, why:'Contoh di materi: AC dirawat 3 bulan sekali.'},
-    {q:'Tujuan pengecekan harian adalah…', o:['Menghabiskan waktu','Deteksi dini kerusakan','Mengganti semua kabel','Menaikkan tagihan listrik'], a:1, why:'Cek harian mendeteksi kerusakan kecil sebelum menjadi besar.'},
-    {q:'Kerusakan yang tidak bisa ditangani internal sebaiknya…', o:['Dibiarkan','Diorder ke pihak ketiga','Diperbaiki paksa tanpa ahli','Disembunyikan'], a:1, why:'Kerusakan di luar kemampuan internal di-order ke vendor/pihak ketiga.'},
-    {q:'Yang BUKAN contoh objek jadwal pemeliharaan di materi adalah…', o:['Lampu','Lift','Pompa air','Mesin pesawat terbang'], a:3, why:'Objek pemeliharaan: AC, lampu, lift, pompa air, panel.'},
-    {q:'Tim pemeliharaan gedung harus selalu…', o:['Cuti terus','Siap sedia','Libur saat kerusakan','Hanya datang saat ada keluhan'], a:1, why:'Kesiapan tim membuat penanganan kerusakan cepat.'},
-    {q:'Perawatan yang dilakukan sebelum kerusakan terjadi disebut…', o:['Korektif','Preventif','Darurat','Pasca-jual'], a:1, why:'Perawatan preventif mencegah kerusakan — dilakukan lewat jadwal & cek rutin.'},
-    {q:'Jika panel listrik sering MCB-trip, langkah pertama adalah…', o:['Ganti MCB terus','Cek beban/rangkaian sesuai SOP','Lepas MCB-nya','Ignore'], a:1, why:'Diagnosa sesuai SOP dulu; bukan asal ganti komponen.'},
-    {q:'Perawatan berdasarkan pemantauan kondisi (suhu/getaran) disebut…', o:['Preventif','Korektif','Prediktif','Darurat'], a:2, why:'Perawatan prediktif didasarkan pada pemantauan kondisi peralatan.'},
-    {q:'Sebelum bekerja pada rangkaian, teknisi wajib…', o:['Langsung menyentuh kabel','Memastikan sumber terputus & uji bebas tegangan','Menaikkan beban','Mematikan semua lampu gedung'], a:1, why:'Pastikan sumber terputus dan lakukan uji bebas tegangan sebelum menyentuh rangkaian (K3).'},
-    {q:'Yang dimaksud downtime adalah…', o:['Waktu peralatan beroperasi','Waktu peralatan tidak beroperasi/berhenti','Jam kerja teknisi','Jadwal cuti'], a:1, why:'Downtime adalah waktu saat peralatan berhenti/tidak beroperasi.'},
-    {q:'Perawatan korektif dilakukan…', o:['Sebelum kerusakan','Setelah kerusakan terjadi','Setiap hari tanpa alasan','Hanya saat audit'], a:1, why:'Perawatan korektif dilakukan setelah kerusakan terjadi.'}
+    {q:"Perawatan berdasarkan pemantauan kondisi (suhu/getaran) disebut…", o:["Darurat", "Prediktif", "Preventif", "Korektif"], a:1, why:"Perawatan prediktif didasarkan pada pemantauan kondisi peralatan."},
+    {q:"Yang BUKAN contoh objek jadwal pemeliharaan di materi adalah…", o:["Lift", "Mesin pesawat terbang", "Lampu", "Pompa air"], a:1, why:"Objek pemeliharaan: AC, lampu, lift, pompa air, panel."},
+    {q:"Kerusakan yang tidak bisa ditangani internal sebaiknya…", o:["Disembunyikan", "Diorder ke pihak ketiga", "Dibiarkan", "Diperbaiki paksa tanpa ahli"], a:1, why:"Kerusakan di luar kemampuan internal di-order ke vendor/pihak ketiga."},
+    {q:"Perawatan yang dilakukan sebelum kerusakan terjadi disebut…", o:["Preventif", "Darurat", "Pasca-jual", "Korektif"], a:0, why:"Perawatan preventif mencegah kerusakan — dilakukan lewat jadwal & cek rutin."},
+    {q:"Yang dimaksud downtime adalah…", o:["Jadwal cuti", "Jam kerja teknisi", "Waktu peralatan tidak beroperasi/berhenti", "Waktu peralatan beroperasi"], a:2, why:"Downtime adalah waktu saat peralatan berhenti/tidak beroperasi."},
+    {q:"Sebelum bekerja pada rangkaian, teknisi wajib…", o:["Langsung menyentuh kabel", "Menaikkan beban", "Memastikan sumber terputus & uji bebas tegangan", "Mematikan semua lampu gedung"], a:2, why:"Pastikan sumber terputus dan lakukan uji bebas tegangan sebelum menyentuh rangkaian (K3)."},
+    {q:"Jika panel listrik sering MCB-trip, langkah pertama adalah…", o:["Lepas MCB-nya", "Ignore", "Ganti MCB terus", "Cek beban/rangkaian sesuai SOP"], a:3, why:"Diagnosa sesuai SOP dulu; bukan asal ganti komponen."},
+    {q:"Tujuan pengecekan harian adalah…", o:["Mengganti semua kabel", "Menaikkan tagihan listrik", "Deteksi dini kerusakan", "Menghabiskan waktu"], a:2, why:"Cek harian mendeteksi kerusakan kecil sebelum menjadi besar."},
+    {q:"Perawatan korektif dilakukan…", o:["Sebelum kerusakan", "Hanya saat audit", "Setiap hari tanpa alasan", "Setelah kerusakan terjadi"], a:3, why:"Perawatan korektif dilakukan setelah kerusakan terjadi."},
+    {q:"Jadwal perawatan AC yang umum adalah…", o:["3 bulan sekali", "3 hari sekali", "10 tahun sekali", "3 tahun sekali"], a:0, why:"Contoh di materi: AC dirawat 3 bulan sekali."},
+    {q:"Tim pemeliharaan gedung harus selalu…", o:["Cuti terus", "Siap sedia", "Libur saat kerusakan", "Hanya datang saat ada keluhan"], a:1, why:"Kesiapan tim membuat penanganan kerusakan cepat."},
+    {q:"SOP perawatan disusun…", o:["Sama untuk semua alat", "Sesuai peralatan yang digunakan", "Hanya untuk AC", "Sekali seumur hidup"], a:1, why:"SOP harus disesuaikan karakteristik tiap peralatan."}
   ]
 },
 {
@@ -1644,92 +1730,92 @@ var MATERI = [
     {istilah:'Sertifikasi', arti:'Pengakuan resmi atas kompetensi/keahlian seseorang.'}
   ],
   kuis:[
-    {q:'Urutan awal alur proyek ME yang benar adalah…', o:['Pemasangan → Perencanaan','Perencanaan → Gambar instalasi → Survey → RAB','RAB → Perencanaan → Gambar','Testing → Perencanaan'], a:1, why:'Dimulai dari perencanaan, gambar instalasi, survey, lalu RAB.'},
-    {q:'Tahap setelah "testing" dalam alur proyek ME adalah…', o:['Survey','Commissioning','RAB','Gambar instalasi'], a:1, why:'Testing dilanjutkan commissioning (serah operasi).'},
-    {q:'Lulusan SMK TITL dapat berposisi sebagai…', o:['Teknisi instalasi & pemeliharaan','Estimator RAB','Drafter gambar instalasi','Semua benar'], a:3, why:'Semua pilihan adalah posisi kerja lulusan TITL.'},
-    {q:'Inti pengelolaan SDM dalam proyek ME adalah…', o:['Menambah orang sebanyak-banyaknya','Menempatkan orang tepat pada tahap yang tepat','Mengurangi gaji','Menghindari pelatihan'], a:1, why:'Pengelolaan SDM memastikan kompetensi tepat guna di tiap tahap.'},
-    {q:'Dokumen gambar instalasi dibuat pada tahap…', o:['Sebelum survey & RAB','Setelah serah terima','Saat penggajian','Saat commissioning saja'], a:0, why:'Gambar instalasi disusun setelah perencanaan awal, menjadi dasar survey & RAB.'},
-    {q:'Kegiatan "pemeliharaan" pada alur proyek dilakukan…', o:['Sebelum gedung dibangun','Setelah commissioning/operasi','Hanya saat proyek selesai kontrak','Tidak perlu'], a:1, why:'Pemeliharaan berjalan selama umur operasional instalasi.'},
-    {q:'Estimator adalah orang yang bertugas…', o:['Menggambar 3D','Menghitung RAB','Menjual makanan','Mengontrol AC'], a:1, why:'Estimator menyusun Rencana Anggaran Biaya.'},
-    {q:'Tahapan terakhir pada alur proyek ME adalah…', o:['Perbaikan','Survey','Penawaran','Presentasi'], a:0, why:'Alur diakhiri perawatan berkelanjutan dan perbaikan bila terjadi kerusakan.'},
-    {q:'Yang menyusun gambar instalasi listrik adalah…', o:['Drafter','Estimator','Supervisor','Kurir'], a:0, why:'Drafter bertugas membuat gambar instalasi listrik.'},
-    {q:'Peran yang memimpin dan bertanggung jawab penuh atas proyek adalah…', o:['Teknisi','Project Manager','Drafter','Estimator'], a:1, why:'Project Manager memimpin dan bertanggung jawab penuh atas proyek.'},
-    {q:'Posisi yang mengawasi mutu & keselamatan kerja di lapangan adalah…', o:['Supervisor','Estimator','Drafter','Supplier'], a:0, why:'Supervisor mengawasi mutu dan keselamatan kerja (K3) di lapangan.'},
-    {q:'Selain kompetensi teknis, lulusan TITL perlu kompetensi…', o:['K3 & soft skill','Menyanyi','Desain grafis','Akuntansi pajak'], a:0, why:'Kompetensi K3 dan soft skill (komunikasi, kerja tim) penting di dunia kerja.'}
+    {q:"Tahapan terakhir pada alur proyek ME adalah…", o:["Perbaikan", "Survey", "Presentasi", "Penawaran"], a:0, why:"Alur diakhiri perawatan berkelanjutan dan perbaikan bila terjadi kerusakan."},
+    {q:"Lulusan SMK TITL dapat berposisi sebagai…", o:["Semua benar", "Teknisi instalasi & pemeliharaan", "Estimator RAB", "Drafter gambar instalasi"], a:0, why:"Semua pilihan adalah posisi kerja lulusan TITL."},
+    {q:"Peran yang memimpin dan bertanggung jawab penuh atas proyek adalah…", o:["Teknisi", "Estimator", "Drafter", "Project Manager"], a:3, why:"Project Manager memimpin dan bertanggung jawab penuh atas proyek."},
+    {q:"Kegiatan \"pemeliharaan\" pada alur proyek dilakukan…", o:["Tidak perlu", "Sebelum gedung dibangun", "Hanya saat proyek selesai kontrak", "Setelah commissioning/operasi"], a:3, why:"Pemeliharaan berjalan selama umur operasional instalasi."},
+    {q:"Selain kompetensi teknis, lulusan TITL perlu kompetensi…", o:["Desain grafis", "Menyanyi", "Akuntansi pajak", "K3 & soft skill"], a:3, why:"Kompetensi K3 dan soft skill (komunikasi, kerja tim) penting di dunia kerja."},
+    {q:"Inti pengelolaan SDM dalam proyek ME adalah…", o:["Menambah orang sebanyak-banyaknya", "Menempatkan orang tepat pada tahap yang tepat", "Mengurangi gaji", "Menghindari pelatihan"], a:1, why:"Pengelolaan SDM memastikan kompetensi tepat guna di tiap tahap."},
+    {q:"Dokumen gambar instalasi dibuat pada tahap…", o:["Saat commissioning saja", "Setelah serah terima", "Sebelum survey & RAB", "Saat penggajian"], a:2, why:"Gambar instalasi disusun setelah perencanaan awal, menjadi dasar survey & RAB."},
+    {q:"Yang menyusun gambar instalasi listrik adalah…", o:["Drafter", "Kurir", "Supervisor", "Estimator"], a:0, why:"Drafter bertugas membuat gambar instalasi listrik."},
+    {q:"Urutan awal alur proyek ME yang benar adalah…", o:["Testing → Perencanaan", "Perencanaan → Gambar instalasi → Survey → RAB", "RAB → Perencanaan → Gambar", "Pemasangan → Perencanaan"], a:1, why:"Dimulai dari perencanaan, gambar instalasi, survey, lalu RAB."},
+    {q:"Posisi yang mengawasi mutu & keselamatan kerja di lapangan adalah…", o:["Estimator", "Supervisor", "Supplier", "Drafter"], a:1, why:"Supervisor mengawasi mutu dan keselamatan kerja (K3) di lapangan."},
+    {q:"Tahap setelah \"testing\" dalam alur proyek ME adalah…", o:["Commissioning", "RAB", "Survey", "Gambar instalasi"], a:0, why:"Testing dilanjutkan commissioning (serah operasi)."},
+    {q:"Estimator adalah orang yang bertugas…", o:["Menghitung RAB", "Menggambar 3D", "Mengontrol AC", "Menjual makanan"], a:0, why:"Estimator menyusun Rencana Anggaran Biaya."}
   ]
 }];
 
 var UJIAN = [
-  {q:'Tahap pertama pekerjaan jasa ME adalah…', o:['Serah terima','Penawaran pekerjaan','Commissioning','Pemeliharaan'], a:1, why:'Jasa ME lebih dulu menerima penawaran pekerjaan dari pemilik/kontraktor utama.'},
-  {q:'RAB berisi…', o:['Daftar hadir','Nilai material, jasa teknisi, sewa alat','Gambar 3D','Jadwal libur'], a:1, why:'RAB memuat nilai material bahan, jasa teknisi, dan sewa alat.'},
-  {q:'SPK diterbitkan setelah…', o:['Kesepakatan tercapai','Gedung selesai','MCB dipasang','Survey gagal'], a:0, why:'SPK terbit setelah rancangan/RAB disetujui pada tahap presentasi.'},
-  {q:'Commissioning parsial berarti pengujian…', o:['Sebagian sistem','Seluruh gedung','Satu kabel','Semua karyawan'], a:0, why:'Parsial = menguji bagian per bagian; holistik = menguji keseluruhan.'},
-  {q:'Data survei instalasi mencakup…', o:['Titik lampu, stop kontak, panel, jalur kabel','Daftar menu kantin','Absensi karyawan','Harga saham'], a:0, why:'Survei menghasilkan data titik lampu, stop kontak, panel, dan jalur kabel.'},
-  {q:'ATS digunakan untuk…', o:['Mengukur tegangan','Perpindahan sumber otomatis PLN-genset','Menyimpan alat','Menghias panel'], a:1, why:'ATS memindahkan sumber dari PLN ke genset secara otomatis.'},
-  {q:'Sebelum membuat panel, hal yang DIHITUNG adalah…', o:['Jumlah tamu','Peralatan, kabel, proteksi','Cuaca','Harga tanah'], a:1, why:'Perhitungan peralatan, kabel, dan proteksi adalah inti pembuatan panel.'},
-  {q:'Panel dibuat sesuai kebutuhan melalui…', o:['Konsultasi dengan pemilik pekerjaan','Tebakan teknisi','Copy-paste proyek lain','Undian'], a:0, why:'Cara kerja panel dikonsultasikan agar sesuai kebutuhan pemilik.'},
-  {q:'Genset mensuplai seluruh gedung otomatis saat padam merupakan contoh…', o:['Kasus panel kendali','Kesalahan instalasi','Pemborosan','Hal mustahil'], a:0, why:'Ini contoh nyata kasus panel kendali dengan ATS/AMF.'},
-  {q:'AC dirawat…', o:['3 bulan sekali','3 tahun sekali','Bila rusak saja','Tidak perlu'], a:0, why:'Contoh jadwal di materi: AC dirawat 3 bulan sekali.'},
-  {q:'Pengecekan harian bertujuan…', o:['Deteksi dini kerusakan','Menghabiskan jam kerja','Mengganti panel','Menaikkan beban'], a:0, why:'Cek harian mendeteksi kerusakan kecil sebelum menjadi besar.'},
-  {q:'Kerusakan di luar kemampuan internal ditangani dengan…', o:['Order pihak ketiga','Diamkan','Matikan gedung','Coba-coba tanpa ahli'], a:0, why:'Kerusakan yang tidak bisa ditangani internal di-order ke pihak ketiga.'},
-  {q:'SOP perawatan dibuat…', o:['Sesuai peralatan','Seragam semua alat','Tanpa dokumen','Hanya saat audit'], a:0, why:'SOP disesuaikan dengan peralatan yang digunakan.'},
-  {q:'Urutan yang benar: …', o:['Survey → RAB → Pemasangan','Pemasangan → Survey → RAB','RAB → Survey → Gambar','Testing → Survey → RAB'], a:0, why:'Setelah survey disusun RAB, baru pemasangan dilakukan.'},
-  {q:'Tahap setelah pemasangan adalah…', o:['Testing','Survey','Penawaran','Presentasi'], a:0, why:'Setelah pemasangan dilakukan testing (parsial/holistik).'},
-  {q:'Tahap akhir alur proyek ME adalah…', o:['Perbaikan','Gambar','RAB','Penawaran'], a:0, why:'Alur diakhiri perawatan berkelanjutan dan perbaikan bila rusak.'},
-  {q:'Estimator bertugas menyusun…', o:['RAB','Gambar karya','Absensi','Kontrak vendor'], a:0, why:'Estimator menyusun Rencana Anggaran Biaya.'},
-  {q:'Serah terima dilakukan antara…', o:['Pelaksana dan pemilik pekerjaan','Dua siswa','Supplier dan kurir','Guru dan ortu'], a:0, why:'Serah terima dilakukan pelaksana kepada pemilik setelah lulus uji.'},
-  {q:'Alat ukur tegangan panel adalah…', o:['Multimeter','Barometer','Higrometer','Speedometer'], a:0, why:'Multimeter mengukur tegangan, arus, dan resistansi.'},
-  {q:'Perawatan preventif dilakukan…', o:['Sebelum kerusakan terjadi','Setelah gedung runtuh','Saat listrik padam total','Tanpa jadwal'], a:0, why:'Perawatan preventif dilakukan terjadwal sebelum kerusakan terjadi.'}
+  {q:"Panel dibuat sesuai kebutuhan melalui…", o:["Undian", "Copy-paste proyek lain", "Konsultasi dengan pemilik pekerjaan", "Tebakan teknisi"], a:2, why:"Cara kerja panel dikonsultasikan agar sesuai kebutuhan pemilik."},
+  {q:"Alat ukur tegangan panel adalah…", o:["Higrometer", "Barometer", "Multimeter", "Speedometer"], a:2, why:"Multimeter mengukur tegangan, arus, dan resistansi."},
+  {q:"Data survei instalasi mencakup…", o:["Titik lampu, stop kontak, panel, jalur kabel", "Absensi karyawan", "Daftar menu kantin", "Harga saham"], a:0, why:"Survei menghasilkan data titik lampu, stop kontak, panel, dan jalur kabel."},
+  {q:"Perawatan preventif dilakukan…", o:["Tanpa jadwal", "Sebelum kerusakan terjadi", "Saat listrik padam total", "Setelah gedung runtuh"], a:1, why:"Perawatan preventif dilakukan terjadwal sebelum kerusakan terjadi."},
+  {q:"SOP perawatan dibuat…", o:["Seragam semua alat", "Hanya saat audit", "Tanpa dokumen", "Sesuai peralatan"], a:3, why:"SOP disesuaikan dengan peralatan yang digunakan."},
+  {q:"Pengecekan harian bertujuan…", o:["Menaikkan beban", "Deteksi dini kerusakan", "Mengganti panel", "Menghabiskan jam kerja"], a:1, why:"Cek harian mendeteksi kerusakan kecil sebelum menjadi besar."},
+  {q:"Commissioning parsial berarti pengujian…", o:["Sebagian sistem", "Seluruh gedung", "Semua karyawan", "Satu kabel"], a:0, why:"Parsial = menguji bagian per bagian; holistik = menguji keseluruhan."},
+  {q:"Tahap setelah pemasangan adalah…", o:["Survey", "Presentasi", "Testing", "Penawaran"], a:2, why:"Setelah pemasangan dilakukan testing (parsial/holistik)."},
+  {q:"Genset mensuplai seluruh gedung otomatis saat padam merupakan contoh…", o:["Kasus panel kendali", "Pemborosan", "Hal mustahil", "Kesalahan instalasi"], a:0, why:"Ini contoh nyata kasus panel kendali dengan ATS/AMF."},
+  {q:"RAB berisi…", o:["Jadwal libur", "Gambar 3D", "Daftar hadir", "Nilai material, jasa teknisi, sewa alat"], a:3, why:"RAB memuat nilai material bahan, jasa teknisi, dan sewa alat."},
+  {q:"Tahap pertama pekerjaan jasa ME adalah…", o:["Commissioning", "Pemeliharaan", "Penawaran pekerjaan", "Serah terima"], a:2, why:"Jasa ME lebih dulu menerima penawaran pekerjaan dari pemilik/kontraktor utama."},
+  {q:"SPK diterbitkan setelah…", o:["Kesepakatan tercapai", "MCB dipasang", "Survey gagal", "Gedung selesai"], a:0, why:"SPK terbit setelah rancangan/RAB disetujui pada tahap presentasi."},
+  {q:"Serah terima dilakukan antara…", o:["Supplier dan kurir", "Pelaksana dan pemilik pekerjaan", "Guru dan ortu", "Dua siswa"], a:1, why:"Serah terima dilakukan pelaksana kepada pemilik setelah lulus uji."},
+  {q:"Urutan yang benar: …", o:["Pemasangan → Survey → RAB", "Testing → Survey → RAB", "Survey → RAB → Pemasangan", "RAB → Survey → Gambar"], a:2, why:"Setelah survey disusun RAB, baru pemasangan dilakukan."},
+  {q:"AC dirawat…", o:["Bila rusak saja", "3 bulan sekali", "3 tahun sekali", "Tidak perlu"], a:1, why:"Contoh jadwal di materi: AC dirawat 3 bulan sekali."},
+  {q:"ATS digunakan untuk…", o:["Mengukur tegangan", "Perpindahan sumber otomatis PLN-genset", "Menghias panel", "Menyimpan alat"], a:1, why:"ATS memindahkan sumber dari PLN ke genset secara otomatis."},
+  {q:"Sebelum membuat panel, hal yang DIHITUNG adalah…", o:["Jumlah tamu", "Harga tanah", "Peralatan, kabel, proteksi", "Cuaca"], a:2, why:"Perhitungan peralatan, kabel, dan proteksi adalah inti pembuatan panel."},
+  {q:"Tahap akhir alur proyek ME adalah…", o:["Penawaran", "Gambar", "RAB", "Perbaikan"], a:3, why:"Alur diakhiri perawatan berkelanjutan dan perbaikan bila rusak."},
+  {q:"Kerusakan di luar kemampuan internal ditangani dengan…", o:["Coba-coba tanpa ahli", "Matikan gedung", "Diamkan", "Order pihak ketiga"], a:3, why:"Kerusakan yang tidak bisa ditangani internal di-order ke pihak ketiga."},
+  {q:"Estimator bertugas menyusun…", o:["RAB", "Gambar karya", "Absensi", "Kontrak vendor"], a:0, why:"Estimator menyusun Rencana Anggaran Biaya."}
 ];
 
 /* ---------- BANK SOAL PRETEST (Form A — 20 PG, 5×C1/C2/C3/C4, draf awal) ----------
    Cakupan: T1 Perencanaan (1-5), T2 Panel (6-10), T3 Pemeliharaan (11-15), T4 SDM (16-20).
    DRAF: wajib validasi ahli + uji coba (validitas, reliabilitas) sebelum dipakai penelitian. */
 var PRETEST = [
-  {q:'Sebuah gedung yang siap digunakan tersusun atas tiga komponen, yaitu…', o:['Struktur, arsitektur, dan ME','Pondasi, cat, dan ME','Struktur, furnitur, dan ME','Atap, keramik, dan ME'], a:0, why:'Tiga komponen: struktur (kekuatan), arsitektur (keindahan), ME (fungsi).'},
-  {q:'Singkatan ME pada pekerjaan gedung adalah…', o:['Mekanikal & Elektrikal','Mesin & Energi','Material & Estimasi','Manajemen & Eksekusi'], a:0, why:'ME = Mekanikal & Elektrikal.'},
-  {q:'Sebuah gedung megah belum bisa digunakan karena sistem ME belum terpasang. Alasannya…', o:['Tanpa ME gedung tidak punya fungsi utilitas seperti listrik, air, dan pendingin','Tanpa ME gedung kurang indah','Tanpa ME pondasi menjadi lemah','Tanpa ME cat cepat pudar'], a:0, why:'ME menghadirkan fungsi gedung: penerangan, tenaga, tata udara, dan air.'},
-  {q:'Tujuan jasa ME melakukan survei lokasi sebelum menyusun RAB adalah…', o:['Mendapatkan data terperinci kebutuhan instalasi','Menambah biaya proyek','Menunda pekerjaan','Mengganti pemilik gedung'], a:0, why:'Survei menghasilkan data titik beban dan kondisi lapangan.'},
-  {q:'Pemilik meminta rincian biaya material, jasa teknisi, dan sewa alat. Dokumen yang wajib disusun adalah…', o:['Rencana Anggaran Biaya (RAB)','Absensi teknisi','Brosur alat','Surat cuti'], a:0, why:'RAB memuat nilai material, jasa teknisi, dan sewa alat.'},
-  {q:'Peralatan yang memindahkan suplai beban dari PLN ke genset secara otomatis adalah…', o:['ATS (Automatic Transfer Switch)','Stop kontak','Sakelar tunggal','Fitting lampu'], a:0, why:'ATS memindahkan sumber PLN–genset secara otomatis.'},
-  {q:'Komponen panel yang memutus arus saat terjadi beban lebih adalah…', o:['MCB (pengaman)','Lampu indikator','Rel DIN','Label kabel'], a:0, why:'MCB/pengaman memutus arus lebih untuk melindungi kabel dan beban.'},
-  {q:'Survei pembuatan panel berbeda dari survei instalasi umum karena…', o:['Berfokus pada peralatan yang akan dikendalikan','Tidak perlu data lapangan','Hanya menghitung cat','Tanpa konsultasi pemilik'], a:0, why:'Panel dirancang mengikuti peralatan yang dikendalikan, misalnya genset.'},
-  {q:'Total beban 4.400 watt pada tegangan 220 volt menarik arus 20 ampere. Kabel dan MCB yang dipasang harus…', o:['Sesuai batas ukur arus 20 A dengan faktor keamanan','Berukuran bebas berapa pun','Lebih kecil dari 20 A agar hemat','Dipasang tanpa proteksi'], a:0, why:'Kabel dan proteksi dihitung sesuai arus beban dan batas ukurnya (P = V × I).'},
-  {q:'Pemilik menghendaki seluruh gedung disuplai genset otomatis begitu PLN padam. Analisis kebutuhan yang tepat adalah…', o:['Kapasitas genset mencakup seluruh beban + panel ATS + konsultasi cara kerja dengan pemilik','Genset sekecil mungkin tanpa panel','Satu stop kontak tambahan','Tanpa perhitungan apa pun'], a:0, why:'Kebutuhan dianalisis dari total beban, kapasitas genset, panel ATS, dan kesepakatan cara kerja.'},
-  {q:'Perawatan AC gedung dilaksanakan setiap…', o:['3 bulan sekali','3 tahun sekali','Saat rusak saja','Tidak pernah'], a:0, why:'Contoh jadwal pada materi: AC dirawat 3 bulan sekali.'},
-  {q:'Jadwal pengecekan harian peralatan bertujuan…', o:['Mendeteksi kerusakan sejak dini','Menghabiskan jam kerja','Mengganti seluruh panel','Menambah beban listrik'], a:0, why:'Cek harian menemukan kerusakan kecil sebelum membesar.'},
-  {q:'Perbedaan perawatan preventif dan korektif adalah…', o:['Preventif terjadwal sebelum rusak, korektif setelah terjadi kerusakan','Keduanya tanpa jadwal','Korektif selalu lebih murah','Preventif hanya untuk gedung baru'], a:0, why:'Preventif mencegah kerusakan, korektif memperbaiki sesudah rusak.'},
-  {q:'Pompa air gedung mati dan tim internal tidak mampu memperbaikinya. Tindakan yang tepat adalah…', o:['Memesan jasa pihak ketiga yang ahli','Membiarkannya sampai kering','Mengganti dengan ember','Menaikkan tegangan sendiri'], a:0, why:'Kerusakan di luar kemampuan internal di-order ke pihak ketiga.'},
-  {q:'Lampu satu lantai putus berulang tiap dua minggu padahal selalu diganti baru. Analisis teknisi yang tepat adalah…', o:['Memeriksa tegangan jalur, sambungan, dan proteksi karena ada akar masalah','Terus mengganti lampu yang sama','Mematikan seluruh gedung','Mengganti pemilik gedung'], a:0, why:'Kerusakan berulang menandakan masalah pada jalur, tegangan, atau proteksi.'},
-  {q:'Salah satu posisi kerja yang dapat diisi lulusan TITL adalah…', o:['Teknisi instalasi listrik','Dokter gigi','Pilot pesawat','Nakhoda kapal'], a:0, why:'Lulusan TITL mengisi pekerjaan bidang ketenagalistrikan.'},
-  {q:'Urutan alur proyek ME yang benar adalah…', o:['Perencanaan → gambar → survei → RAB → pemasangan → testing → commissioning → pemeliharaan','Pemasangan → survei → RAB → gambar','Testing → survei → RAB → gambar','RAB → testing → survei → gambar'], a:0, why:'Alur: perencanaan, gambar, survei, RAB, pemasangan, testing, commissioning, pemeliharaan.'},
-  {q:'Perusahaan membutuhkan orang yang menghitung biaya proyek instalasi. Tenaga yang tepat adalah…', o:['Estimator yang menyusun RAB','Satpam gerbang','Sopir direksi','Resepsionis'], a:0, why:'Estimator menyusun Rencana Anggaran Biaya.'},
-  {q:'Tugas supervisor pada pekerjaan instalasi di lapangan adalah…', o:['Mengawasi mutu pekerjaan dan keselamatan kerja (K3)','Menyapu area proyek','Menjual material sisa','Mengatur menu kantin'], a:0, why:'Supervisor mengawasi mutu pekerjaan dan K3.'},
-  {q:'Dua penawaran masuk: A murah tanpa SOP pemeliharaan, B sedikit lebih mahal dengan SOP dan jadwal perawatan. Untuk keberlanjutan gedung, analisis yang tepat adalah…', o:['Memilih B karena total biaya jangka panjang lebih rendah dan kerusakan terkendali','Memilih A karena murah di awal','Menolak keduanya tanpa alasan','Memilih secara acak'], a:0, why:'SOP dan jadwal perawatan menekan kerusakan dan biaya jangka panjang.'}
+  {q:"Tugas supervisor pada pekerjaan instalasi di lapangan adalah…", o:["Mengatur menu kantin", "Mengawasi mutu pekerjaan dan keselamatan kerja (K3)", "Menyapu area proyek", "Menjual material sisa"], a:1, why:"Supervisor mengawasi mutu pekerjaan dan K3."},
+  {q:"Peralatan yang memindahkan suplai beban dari PLN ke genset secara otomatis adalah…", o:["Stop kontak", "Sakelar tunggal", "Fitting lampu", "ATS (Automatic Transfer Switch)"], a:3, why:"ATS memindahkan sumber PLN–genset secara otomatis."},
+  {q:"Survei pembuatan panel berbeda dari survei instalasi umum karena…", o:["Berfokus pada peralatan yang akan dikendalikan", "Hanya menghitung cat", "Tanpa konsultasi pemilik", "Tidak perlu data lapangan"], a:0, why:"Panel dirancang mengikuti peralatan yang dikendalikan, misalnya genset."},
+  {q:"Total beban 4.400 watt pada tegangan 220 volt menarik arus 20 ampere. Kabel dan MCB yang dipasang harus…", o:["Lebih kecil dari 20 A agar hemat", "Berukuran bebas berapa pun", "Dipasang tanpa proteksi", "Sesuai batas ukur arus 20 A dengan faktor keamanan"], a:3, why:"Kabel dan proteksi dihitung sesuai arus beban dan batas ukurnya (P = V × I)."},
+  {q:"Jadwal pengecekan harian peralatan bertujuan…", o:["Mendeteksi kerusakan sejak dini", "Menghabiskan jam kerja", "Mengganti seluruh panel", "Menambah beban listrik"], a:0, why:"Cek harian menemukan kerusakan kecil sebelum membesar."},
+  {q:"Komponen panel yang memutus arus saat terjadi beban lebih adalah…", o:["Lampu indikator", "Label kabel", "Rel DIN", "MCB (pengaman)"], a:3, why:"MCB/pengaman memutus arus lebih untuk melindungi kabel dan beban."},
+  {q:"Pemilik menghendaki seluruh gedung disuplai genset otomatis begitu PLN padam. Analisis kebutuhan yang tepat adalah…", o:["Tanpa perhitungan apa pun", "Kapasitas genset mencakup seluruh beban + panel ATS + konsultasi cara kerja dengan pemilik", "Genset sekecil mungkin tanpa panel", "Satu stop kontak tambahan"], a:1, why:"Kebutuhan dianalisis dari total beban, kapasitas genset, panel ATS, dan kesepakatan cara kerja."},
+  {q:"Singkatan ME pada pekerjaan gedung adalah…", o:["Material & Estimasi", "Manajemen & Eksekusi", "Mekanikal & Elektrikal", "Mesin & Energi"], a:2, why:"ME = Mekanikal & Elektrikal."},
+  {q:"Perawatan AC gedung dilaksanakan setiap…", o:["Saat rusak saja", "3 bulan sekali", "3 tahun sekali", "Tidak pernah"], a:1, why:"Contoh jadwal pada materi: AC dirawat 3 bulan sekali."},
+  {q:"Dua penawaran masuk: A murah tanpa SOP pemeliharaan, B sedikit lebih mahal dengan SOP dan jadwal perawatan. Untuk keberlanjutan gedung, analisis yang tepat adalah…", o:["Memilih secara acak", "Memilih A karena murah di awal", "Memilih B karena total biaya jangka panjang lebih rendah dan kerusakan terkendali", "Menolak keduanya tanpa alasan"], a:2, why:"SOP dan jadwal perawatan menekan kerusakan dan biaya jangka panjang."},
+  {q:"Pompa air gedung mati dan tim internal tidak mampu memperbaikinya. Tindakan yang tepat adalah…", o:["Memesan jasa pihak ketiga yang ahli", "Membiarkannya sampai kering", "Menaikkan tegangan sendiri", "Mengganti dengan ember"], a:0, why:"Kerusakan di luar kemampuan internal di-order ke pihak ketiga."},
+  {q:"Lampu satu lantai putus berulang tiap dua minggu padahal selalu diganti baru. Analisis teknisi yang tepat adalah…", o:["Terus mengganti lampu yang sama", "Mematikan seluruh gedung", "Mengganti pemilik gedung", "Memeriksa tegangan jalur, sambungan, dan proteksi karena ada akar masalah"], a:3, why:"Kerusakan berulang menandakan masalah pada jalur, tegangan, atau proteksi."},
+  {q:"Pemilik meminta rincian biaya material, jasa teknisi, dan sewa alat. Dokumen yang wajib disusun adalah…", o:["Brosur alat", "Absensi teknisi", "Surat cuti", "Rencana Anggaran Biaya (RAB)"], a:3, why:"RAB memuat nilai material, jasa teknisi, dan sewa alat."},
+  {q:"Perbedaan perawatan preventif dan korektif adalah…", o:["Preventif terjadwal sebelum rusak, korektif setelah terjadi kerusakan", "Keduanya tanpa jadwal", "Korektif selalu lebih murah", "Preventif hanya untuk gedung baru"], a:0, why:"Preventif mencegah kerusakan, korektif memperbaiki sesudah rusak."},
+  {q:"Sebuah gedung megah belum bisa digunakan karena sistem ME belum terpasang. Alasannya…", o:["Tanpa ME pondasi menjadi lemah", "Tanpa ME gedung tidak punya fungsi utilitas seperti listrik, air, dan pendingin", "Tanpa ME gedung kurang indah", "Tanpa ME cat cepat pudar"], a:1, why:"ME menghadirkan fungsi gedung: penerangan, tenaga, tata udara, dan air."},
+  {q:"Perusahaan membutuhkan orang yang menghitung biaya proyek instalasi. Tenaga yang tepat adalah…", o:["Estimator yang menyusun RAB", "Resepsionis", "Sopir direksi", "Satpam gerbang"], a:0, why:"Estimator menyusun Rencana Anggaran Biaya."},
+  {q:"Tujuan jasa ME melakukan survei lokasi sebelum menyusun RAB adalah…", o:["Mengganti pemilik gedung", "Menambah biaya proyek", "Mendapatkan data terperinci kebutuhan instalasi", "Menunda pekerjaan"], a:2, why:"Survei menghasilkan data titik beban dan kondisi lapangan."},
+  {q:"Sebuah gedung yang siap digunakan tersusun atas tiga komponen, yaitu…", o:["Struktur, furnitur, dan ME", "Atap, keramik, dan ME", "Pondasi, cat, dan ME", "Struktur, arsitektur, dan ME"], a:3, why:"Tiga komponen: struktur (kekuatan), arsitektur (keindahan), ME (fungsi)."},
+  {q:"Urutan alur proyek ME yang benar adalah…", o:["Testing → survei → RAB → gambar", "RAB → testing → survei → gambar", "Perencanaan → gambar → survei → RAB → pemasangan → testing → commissioning → pemeliharaan", "Pemasangan → survei → RAB → gambar"], a:2, why:"Alur: perencanaan, gambar, survei, RAB, pemasangan, testing, commissioning, pemeliharaan."},
+  {q:"Salah satu posisi kerja yang dapat diisi lulusan TITL adalah…", o:["Pilot pesawat", "Dokter gigi", "Nakhoda kapal", "Teknisi instalasi listrik"], a:3, why:"Lulusan TITL mengisi pekerjaan bidang ketenagalistrikan."}
 ];
 
 /* ---------- BANK SOAL POSTTEST (Form B — paralel dengan Pretest, draf awal) ---------- */
 var POSTTEST = [
-  {q:'Bagian bangunan yang berfokus pada kekuatan dan kestabilan adalah…', o:['Struktur','Arsitektur','ME','Dekorasi'], a:0, why:'Struktur: pondasi, kolom, balok, dan truss (rangka atap).'},
-  {q:'RAB adalah singkatan dari…', o:['Rencana Anggaran Biaya','Rapat Anggaran Bulanan','Rincian Alat Bengkel','Rekap Absensi Buruh'], a:0, why:'RAB = Rencana Anggaran Biaya.'},
-  {q:'Tujuan presentasi jasa ME di depan pemilik pekerjaan adalah…', o:['Membahas kesesuaian rancangan sampai terjadi kesepakatan','Pamer tanpa diskusi','Menambah harga sepihak','Membatalkan proyek'], a:0, why:'Presentasi membahas bagian yang kurang cocok sampai sepakat.'},
-  {q:'Surat Perintah Kerja (SPK) diterbitkan setelah…', o:['Terjadi kesepakatan antara pemilik dan jasa ME','Gedung selesai dibangun','MCB dipasang','Survei gagal'], a:0, why:'SPK terbit setelah rancangan dan RAB disetujui.'},
-  {q:'Dari gambar denah terdapat 10 titik lampu @20 W dan 4 stop kontak @100 W. Total daya beban adalah…', o:['600 watt','120 watt','400 watt','1.000 watt'], a:0, why:'(10 × 20) + (4 × 100) = 200 + 400 = 600 watt.'},
-  {q:'Genset pada gedung berfungsi sebagai…', o:['Sumber listrik cadangan saat PLN padam','Hiasan halaman','Pengeras suara','Penangkal petir'], a:0, why:'Genset memasok listrik saat sumber utama padam.'},
-  {q:'Perhitungan kabel dan proteksi pada panel sangat penting karena…', o:['Arus berlebih menimbulkan panas dan bahaya kebakaran','Kabel berwarna terlihat menarik','Panel terlihat penuh','Agar tagihan naik'], a:0, why:'Kabel atau proteksi yang salah ukuran berisiko panas dan kebakaran.'},
-  {q:'Beban 4.400 watt / 220 volt = 20 A. Tersedia MCB 10 A dan 25 A. Pilihan yang tepat adalah…', o:['MCB 25 A karena di atas arus beban sesuai batas ukur','MCB 10 A agar cepat trip','Tanpa MCB','Dua MCB 10 A diseri'], a:0, why:'Proteksi dipilih di atas arus beban normal sesuai batas ukurnya.'},
-  {q:'Panel sering trip padahal beban tidak bertambah. Analisis yang tepat adalah…', o:['Memeriksa kemungkinan MCB kekecilan, sambungan longgar, atau beban tak seimbang','Langsung melepas MCB','Menambah beban lagi','Mengganti gedung'], a:0, why:'Trip berulang dianalisis dari ukuran proteksi, sambungan, dan pembagian beban.'},
-  {q:'Ruang server butuh suplai tanpa kedip saat peralihan PLN–genset. Rekomendasi yang tepat adalah…', o:['Panel ATS ditambah UPS untuk beban kritis','Stop kontak biasa','Tanpa panel','Genset tanpa bahan bakar'], a:0, why:'ATS memindahkan sumber, UPS menutup jeda peralihan untuk beban kritis.'},
-  {q:'SOP perawatan gedung dibuat berdasarkan…', o:['Jenis peralatan yang digunakan','Warna dinding','Selera pemilik','Musim liburan'], a:0, why:'SOP disesuaikan dengan peralatan yang dipelihara.'},
-  {q:'Kerusakan boleh ditangani tim internal jika…', o:['Kemampuan, peralatan, dan keselamatan kerja terpenuhi','Kapan pun tanpa alat','Sambil berjalan tanpa APD','Tanpa laporan'], a:0, why:'Penanganan internal hanya bila mampu, beralat, dan aman (K3).'},
-  {q:'Lift berbunyi aneh dan teknisi internal ragu menanganinya. Tindakan yang tepat adalah…', o:['Menghentikan operasi lift dan memanggil pihak ketiga yang ahli','Tetap mengangkut penumpang','Membongkar sendiri tanpa panduan','Menutup kasus'], a:0, why:'Keselamatan utama: hentikan operasi, serahkan ke ahlinya.'},
-  {q:'Untuk gedung dengan lift dan pompa kritis, strategi cek harian rutin dibanding perbaiki-saat-rusak-saja. Analisis yang tepat adalah…', o:['Cek harian rutin karena mencegah kegagalan fatal yang biayanya jauh lebih besar','Perbaiki saat rusak karena paling hemat','Tanpa strategi apa pun','Serahkan ke penghuni'], a:0, why:'Perawatan preventif mencegah kegagalan fatal dan biaya besar.'},
-  {q:'Data kerusakan dari laporan pemilik berguna bagi tim pemelihara untuk…', o:['Bersiaga dan menyiapkan penanganan','Arsip tanpa dibaca','Alasan cuti','Bahan gosip'], a:0, why:'Laporan pemilik menjadi dasar kesiagaan tim pemelihara.'},
-  {q:'Tahap setelah pemasangan instalasi dalam alur proyek ME adalah…', o:['Testing (parsial/holistik)','Survei ulang dari nol','Penawaran baru','Presentasi awal'], a:0, why:'Setelah pemasangan dilakukan testing atau commissioning.'},
-  {q:'Serah terima hasil pekerjaan dilakukan antara…', o:['Pelaksana dan pemilik pekerjaan','Dua siswa','Supplier dan kurir','Guru dan orang tua'], a:0, why:'Serah terima: pelaksana kepada pemilik setelah lulus uji.'},
-  {q:'Drafter dalam tim proyek instalasi bertugas…', o:['Menggambar rancangan instalasi','Mengelas pipa','Menyopir truk','Memasak katering'], a:0, why:'Drafter menggambar rancangan instalasi listrik.'},
-  {q:'Lulusan baru memilih antara helper proyek (belajar alur lengkap) dan operator jaga (gaji awal sedikit lebih tinggi, tugas monoton). Untuk karier teknisi jangka panjang, analisis yang tepat adalah…', o:['Helper proyek karena menguasai alur perencanaan → commissioning → pemeliharaan','Operator jaga karena gaji awal','Menolak keduanya','Memilih acak'], a:0, why:'Penguasaan alur lengkap membangun kompetensi teknisi.'},
-  {q:'Tim pengawas melaporkan mutu pemasangan buruk meski target waktu tercapai. Keputusan yang tepat adalah…', o:['Perbaiki mutu dulu karena keselamatan dan fungsi tidak bisa ditawar waktu','Terima apa adanya demi cepat','Sembunyikan laporan','Ganti pengawas'], a:0, why:'Mutu dan keselamatan (K3) tidak boleh dikorbankan demi kecepatan.'}
+  {q:"Drafter dalam tim proyek instalasi bertugas…", o:["Menggambar rancangan instalasi", "Mengelas pipa", "Menyopir truk", "Memasak katering"], a:0, why:"Drafter menggambar rancangan instalasi listrik."},
+  {q:"Bagian bangunan yang berfokus pada kekuatan dan kestabilan adalah…", o:["ME", "Struktur", "Dekorasi", "Arsitektur"], a:1, why:"Struktur: pondasi, kolom, balok, dan truss (rangka atap)."},
+  {q:"Genset pada gedung berfungsi sebagai…", o:["Hiasan halaman", "Pengeras suara", "Sumber listrik cadangan saat PLN padam", "Penangkal petir"], a:2, why:"Genset memasok listrik saat sumber utama padam."},
+  {q:"Surat Perintah Kerja (SPK) diterbitkan setelah…", o:["Terjadi kesepakatan antara pemilik dan jasa ME", "Survei gagal", "MCB dipasang", "Gedung selesai dibangun"], a:0, why:"SPK terbit setelah rancangan dan RAB disetujui."},
+  {q:"Panel sering trip padahal beban tidak bertambah. Analisis yang tepat adalah…", o:["Menambah beban lagi", "Langsung melepas MCB", "Mengganti gedung", "Memeriksa kemungkinan MCB kekecilan, sambungan longgar, atau beban tak seimbang"], a:3, why:"Trip berulang dianalisis dari ukuran proteksi, sambungan, dan pembagian beban."},
+  {q:"RAB adalah singkatan dari…", o:["Rapat Anggaran Bulanan", "Rekap Absensi Buruh", "Rincian Alat Bengkel", "Rencana Anggaran Biaya"], a:3, why:"RAB = Rencana Anggaran Biaya."},
+  {q:"Beban 4.400 watt / 220 volt = 20 A. Tersedia MCB 10 A dan 25 A. Pilihan yang tepat adalah…", o:["MCB 10 A agar cepat trip", "MCB 25 A karena di atas arus beban sesuai batas ukur", "Dua MCB 10 A diseri", "Tanpa MCB"], a:1, why:"Proteksi dipilih di atas arus beban normal sesuai batas ukurnya."},
+  {q:"Ruang server butuh suplai tanpa kedip saat peralihan PLN–genset. Rekomendasi yang tepat adalah…", o:["Stop kontak biasa", "Genset tanpa bahan bakar", "Panel ATS ditambah UPS untuk beban kritis", "Tanpa panel"], a:2, why:"ATS memindahkan sumber, UPS menutup jeda peralihan untuk beban kritis."},
+  {q:"Tahap setelah pemasangan instalasi dalam alur proyek ME adalah…", o:["Presentasi awal", "Penawaran baru", "Survei ulang dari nol", "Testing (parsial/holistik)"], a:3, why:"Setelah pemasangan dilakukan testing atau commissioning."},
+  {q:"Lift berbunyi aneh dan teknisi internal ragu menanganinya. Tindakan yang tepat adalah…", o:["Membongkar sendiri tanpa panduan", "Tetap mengangkut penumpang", "Menghentikan operasi lift dan memanggil pihak ketiga yang ahli", "Menutup kasus"], a:2, why:"Keselamatan utama: hentikan operasi, serahkan ke ahlinya."},
+  {q:"Untuk gedung dengan lift dan pompa kritis, strategi cek harian rutin dibanding perbaiki-saat-rusak-saja. Analisis yang tepat adalah…", o:["Serahkan ke penghuni", "Cek harian rutin karena mencegah kegagalan fatal yang biayanya jauh lebih besar", "Perbaiki saat rusak karena paling hemat", "Tanpa strategi apa pun"], a:1, why:"Perawatan preventif mencegah kegagalan fatal dan biaya besar."},
+  {q:"Kerusakan boleh ditangani tim internal jika…", o:["Sambil berjalan tanpa APD", "Kapan pun tanpa alat", "Tanpa laporan", "Kemampuan, peralatan, dan keselamatan kerja terpenuhi"], a:3, why:"Penanganan internal hanya bila mampu, beralat, dan aman (K3)."},
+  {q:"Tim pengawas melaporkan mutu pemasangan buruk meski target waktu tercapai. Keputusan yang tepat adalah…", o:["Terima apa adanya demi cepat", "Perbaiki mutu dulu karena keselamatan dan fungsi tidak bisa ditawar waktu", "Ganti pengawas", "Sembunyikan laporan"], a:1, why:"Mutu dan keselamatan (K3) tidak boleh dikorbankan demi kecepatan."},
+  {q:"SOP perawatan gedung dibuat berdasarkan…", o:["Selera pemilik", "Musim liburan", "Jenis peralatan yang digunakan", "Warna dinding"], a:2, why:"SOP disesuaikan dengan peralatan yang dipelihara."},
+  {q:"Tujuan presentasi jasa ME di depan pemilik pekerjaan adalah…", o:["Membahas kesesuaian rancangan sampai terjadi kesepakatan", "Membatalkan proyek", "Pamer tanpa diskusi", "Menambah harga sepihak"], a:0, why:"Presentasi membahas bagian yang kurang cocok sampai sepakat."},
+  {q:"Dari gambar denah terdapat 10 titik lampu @20 W dan 4 stop kontak @100 W. Total daya beban adalah…", o:["600 watt", "1.000 watt", "400 watt", "120 watt"], a:0, why:"(10 × 20) + (4 × 100) = 200 + 400 = 600 watt."},
+  {q:"Data kerusakan dari laporan pemilik berguna bagi tim pemelihara untuk…", o:["Arsip tanpa dibaca", "Bersiaga dan menyiapkan penanganan", "Alasan cuti", "Bahan gosip"], a:1, why:"Laporan pemilik menjadi dasar kesiagaan tim pemelihara."},
+  {q:"Lulusan baru memilih antara helper proyek (belajar alur lengkap) dan operator jaga (gaji awal sedikit lebih tinggi, tugas monoton). Untuk karier teknisi jangka panjang, analisis yang tepat adalah…", o:["Helper proyek karena menguasai alur perencanaan → commissioning → pemeliharaan", "Menolak keduanya", "Operator jaga karena gaji awal", "Memilih acak"], a:0, why:"Penguasaan alur lengkap membangun kompetensi teknisi."},
+  {q:"Perhitungan kabel dan proteksi pada panel sangat penting karena…", o:["Panel terlihat penuh", "Kabel berwarna terlihat menarik", "Arus berlebih menimbulkan panas dan bahaya kebakaran", "Agar tagihan naik"], a:2, why:"Kabel atau proteksi yang salah ukuran berisiko panas dan kebakaran."},
+  {q:"Serah terima hasil pekerjaan dilakukan antara…", o:["Dua siswa", "Supplier dan kurir", "Guru dan orang tua", "Pelaksana dan pemilik pekerjaan"], a:3, why:"Serah terima: pelaksana kepada pemilik setelah lulus uji."}
 ];
 
 /* ---------- BACKEND LAYER (GAS / Local / Dummy) ---------- */
@@ -1829,6 +1915,22 @@ function bestScore(key){
   return node ? node.best : null;
 }
 
+/* ---------- MENU SAMPING (drawer HP) ----------
+   Satu-satunya pemicu menu adalah tombol di mobile-topbar.
+   Saat terbuka: menu overlay + scroll terkunci di menu, konten belakang diam. */
+function toggleSidebar(force){
+  var sb = document.getElementById('sidebar');
+  var bd = document.getElementById('sbBackdrop');
+  var buka = (typeof force === 'boolean') ? force : !sb.classList.contains('open');
+  sb.classList.toggle('open', buka);
+  if(bd) bd.classList.toggle('show', buka);
+  document.body.classList.toggle('menu-open', buka);
+  return false;
+}
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') toggleSidebar(false);
+});
+
 /* ---------- ROUTER ---------- */
 var routes = { dashboard:renderDashboard, materi:renderMateriList, materidetail:renderMateriDetail, kuis:renderKuis, ujian:renderUjian, angket:renderAngket, pretest:renderPretest, posttest:renderPosttest };
 function route(){
@@ -1836,7 +1938,7 @@ function route(){
   var parts = h.split('/');
   var page = parts[0]||'dashboard';
   var arg = parts[1]?decodeURIComponent(parts[1]):null;
-  document.getElementById('sidebar').classList.remove('open');
+  toggleSidebar(false); // tutup menu tiap pindah halaman (sekaligus buka kunci scroll)
   (routes[page]||renderDashboard)(arg);
   highlightNav(page, arg);
   window.scrollTo(0,0);
@@ -2192,6 +2294,30 @@ function kuisLanjut(key, nomor, isUjian, passed){
 // Pintu masuk dari tombol: pindah ke halaman kuis.
 function startQuiz(key){ go('/kuis/'+key); }
 
+/* ---------- ACAK SOAL (anti-hafalan pola jawaban) ----------
+   Setiap kali kuis dimulai, urutan soal DAN urutan opsi (A-D) diacak
+   per siswa per percobaan. Kunci jawaban mengikuti teks opsi yang benar,
+   jadi penilaian tetap valid. Acakan hanya di memori (tidak mengubah bank soal). */
+function acakArray(arr){
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=arr[i];arr[i]=arr[j];arr[j]=t;
+  }
+  return arr;
+}
+function siapkanSoalAcak(qs){
+  var salin = qs.map(function(q){
+    return { q:q.q, o:q.o.slice(), a:q.a, why:q.why };
+  });
+  acakArray(salin); // acak urutan soal
+  salin.forEach(function(q){
+    var benar = q.o[q.a]; // teks jawaban yang benar
+    acakArray(q.o);       // acak urutan opsi
+    q.a = q.o.indexOf(benar); // kunci mengikuti teks yang benar
+  });
+  return salin;
+}
+
 function renderKuis(key){
   var main = document.getElementById('main');
   var isUjian = key==='ujian';
@@ -2212,12 +2338,13 @@ function renderKuis(key){
   }
   var qs = isUjian ? UJIAN : (isPre ? PRETEST : (isPost ? POSTTEST : MATERI[nomor-1].kuis));
   var label = isUjian ? 'Ujian Akhir' : (isPre ? 'Pretest' : (isPost ? 'Posttest' : 'Kuis Materi '+nomor));
-  quiz = { key:key, isUjian:isUjian, nomor:nomor, label:label, qs:qs, idx:0, ans:new Array(qs.length).fill(null), done:false };
+  quiz = { key:key, isUjian:isUjian, nomor:nomor, label:label, qs:siapkanSoalAcak(qs), idx:0, ans:new Array(qs.length).fill(null), done:false };
   drawKuis();
 }
 
-function drawKuis(){
+function drawKuis(restoreScroll){
   if(!quiz || quiz.done) return;
+  var y = (restoreScroll===true) ? (window.scrollY||window.pageYOffset||0) : null;
   var q = quiz.qs[quiz.idx];
   var jawab = quiz.ans.filter(function(a){ return a!==null; }).length;
   var opts = q.o.map(function(o,i){
@@ -2239,7 +2366,9 @@ function drawKuis(){
   + '<div class="card quiz-card-full">'
   + '<div class="quiz-q">'+q.q+'</div>'
   + '<div class="quiz-opts">'+opts+'</div>'
-  + '<div class="why-box" id="whyBox" style="'+(quiz.ans[quiz.idx]!==null && q.why ? 'display:block' : '')+'">'+(q.why?ICON.bulb+' '+q.why:'')+'</div>'
+  // Pembahasan SENGAJA tidak ditampilkan selama ujian (anti-contek):
+  // baru muncul di halaman hasil untuk soal yang belum tepat.
+  + (quiz.ans[quiz.idx]!==null ? '<div class="why-box" style="display:block">'+ICON.check+' Jawaban tersimpan. Lanjut ke soal berikutnya.</div>' : '<div class="why-box" id="whyBox"></div>')
   + '</div>'
   + '<div class="card quiz-nav-wrap">'
   + '<div class="quiz-nav-title"><span>Navigasi soal</span><span class="quiz-answered-bar">'+jawab+'/'+quiz.qs.length+' terjawab</span></div>'
@@ -2250,7 +2379,7 @@ function drawKuis(){
   + '<button class="btn-hero-primary" onclick="quizNav(1)">'+(quiz.idx===quiz.qs.length-1?'Selesai →':'Lanjut →')+'</button>'
   + '</div>'
   + '</div>';
-  window.scrollTo(0,0);
+  if(y!==null){ window.scrollTo(0,y); } else { window.scrollTo(0,0); }
 }
 
 function gotoSoal(i){
@@ -2261,19 +2390,41 @@ function gotoSoal(i){
 
 function pickOpt(i){
   quiz.ans[quiz.idx] = i;
-  drawKuis();
+  drawKuis(true); // tahan posisi scroll agar tidak lompat ke atas (penting di HP)
+}
+
+function quizBelumDijawab(){
+  var kosong = [];
+  quiz.qs.forEach(function(_, i){ if(quiz.ans[i]===null) kosong.push(i+1); });
+  return kosong;
 }
 
 function quizNav(dir){
   if(dir===1 && quiz.ans[quiz.idx]===null){ showToast('Pilih salah satu jawaban dulu','error'); return; }
   var next = quiz.idx + dir;
-  if(next >= quiz.qs.length) return quizResult();
+  if(next >= quiz.qs.length){
+    var kosong = quizBelumDijawab();
+    if(kosong.length){
+      showToast('Masih ada soal belum dijawab: no. '+kosong.slice(0,5).join(', ')+(kosong.length>5?'…':''), 'error');
+      quiz.idx = kosong[0]-1;
+      drawKuis();
+      return;
+    }
+    return quizResult();
+  }
   quiz.idx = (next < 0) ? 0 : next;
   drawKuis();
 }
 
 function quizResult(){
   if(!quiz) return;
+  var kosong = quizBelumDijawab();
+  if(kosong.length){
+    showToast('Masih ada soal belum dijawab: no. '+kosong.slice(0,5).join(', ')+(kosong.length>5?'…':''), 'error');
+    quiz.idx = kosong[0]-1;
+    drawKuis();
+    return;
+  }
   var score = 0;
   quiz.qs.forEach(function(q,i){ if(quiz.ans[i]===q.a) score++; });
   var nilai = Math.round(score/quiz.qs.length*100);
